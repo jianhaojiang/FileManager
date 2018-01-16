@@ -55,8 +55,40 @@ public class FileUtil {
         return FileType.other ;
     }
 
+
+    private static boolean isLetter(String str) {
+        String regex = "^[a-zA-Z]+$";//其他需要，直接修改正则表达式就好
+//        String regex = "^[a-z0-9A-Z\u4e00-\u9fa5]+$"
+        return str.matches(regex);
+    }
+
+    //自定义文件排序，汉字，_，字母依次
+    private static int compareAB(String left2, String right2){
+        String A = left2.substring(0,1);
+        String B = right2.substring(0,1);
+        if(!isLetter(A) && !isLetter(B)){
+            return A.compareTo(B);
+        }else if(!isLetter(A)){
+            return -1;
+        }else if(!isLetter(B)){
+            return 1;
+        }else {
+            //将字母的按字母排序，不按大小写排序
+            String a = A.toLowerCase();
+            String b = B.toLowerCase();
+            if(a.compareTo(b) == 0){
+                return A.compareTo(B);
+            }else {
+                return a.compareTo(b);
+            }
+        }
+
+    }
+
     /**
-     * 文件按照名字排序
+     * 文件先按照文件夹在上文件再后排序
+     * 然后类型一样按名字排名，汉字，_，等在前，字母放在后面
+     * 类型不同按类型排名
      */
     public static Comparator comparator = new Comparator<File>() {
         @Override
@@ -65,8 +97,12 @@ public class FileUtil {
                 return -1 ;
             }else if ( file1.isFile() && file2.isDirectory() ){
                 return 1 ;
+            }else if(FileUtil.getFileType(file1) != FileUtil.getFileType(file2)){
+                //先按类型排序，这里根据FileUtil.getFileType()方法归类
+                return FileUtil.getFileType(file1).compareTo(FileUtil.getFileType(file2));
             }else {
-                return file1.getName().compareTo( file2.getName() ) ;
+                //再排序同类型的文件或文件夹
+                return compareAB(file1.getName(), file2.getName()) ;
             }
         }
     } ;
