@@ -51,6 +51,13 @@ public class FileUtil {
         if ( fileName.endsWith(".apk") ) {
             return FileType.apk ;
         }
+        if ( fileName.endsWith(".pdf") ) {
+            return FileType.pdf ;
+        }
+        if ( fileName.endsWith(".doc") ) {
+            return FileType.doc ;
+        }
+
 
         return FileType.other ;
     }
@@ -98,7 +105,7 @@ public class FileUtil {
             }else if ( file1.isFile() && file2.isDirectory() ){
                 return 1 ;
             }else if(FileUtil.getFileType(file1) != FileUtil.getFileType(file2)){
-                //先按类型排序，这里根据FileUtil.getFileType()方法归类
+                //先按类型排序
                 return FileUtil.getFileType(file1).compareTo(FileUtil.getFileType(file2));
             }else {
                 //再排序同类型的文件或文件夹
@@ -123,6 +130,45 @@ public class FileUtil {
         }
         return count;
     }
+
+    /**
+     * 获取文件的子文件个数
+     * @param file
+     * @return
+     */
+    public static int getSonFileCount(File file) {
+        int count = 0;
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            for (File f : files) {
+                if (f.isHidden()) continue;
+                if(!f.isDirectory()){
+                    count ++ ;
+                }
+            }
+        }
+        return count;
+    }
+
+    /**
+     * 获取文件的子文件夹个数
+     * @param file
+     * @return
+     */
+    public static int getSonFloderCount(File file) {
+        int count = 0;
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            for (File f : files) {
+                if (f.isHidden()) continue;
+                if(f.isDirectory()){
+                    count ++ ;
+                }
+            }
+        }
+        return count;
+    }
+
 
     /**
      * 文件大小转换
@@ -150,13 +196,25 @@ public class FileUtil {
         return size + " B" ;
     }
 
+   /*
+    android intent中设置如下flag，可以清除栈顶的activity：
+    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    还有其他tag如下：
+    1.FLAG_ACTIVITY_CLEAR_TOP：跳转到的activity若已在栈中存在，则将其上的activity都销掉。
+    2.FLAG_ACTIVITY_NEW_TASK：activity要存在于activity的栈中，而非activity的途径启动activity时必然不存在一个
+    activity的栈，所以要新起一个栈装入启动的activity。简而言之，跳转到的activity根据情况，可能压在一个新建的栈中。
+    3.FLAG_ACTIVITY_NO_HISTORY：跳转到的activity不压在栈中。
+    4.FLAG_ACTIVITY_SINGLE_TOP：和Activity的Launch mode的singleTop类似。如果某个intent添加了这个标志，
+    并且这个intent的目标activity就是栈顶的activity，那么将不会新建一个实例压入栈中。简而言之，
+    目标activity已在栈顶则跳转过去，不在栈顶则在栈顶新建activity。
+    */
     /**
      * 安装apk
      * @param context
      * @param file
      */
     public static void openAppIntent(Context context , File file ){
-        Intent intent = new Intent(Intent.ACTION_VIEW);
+        Intent intent = new Intent(Intent.ACTION_VIEW);//显示数据的通用intent
         intent.setDataAndType(Uri.fromFile( file ), "application/vnd.android.package-archive");
         context.startActivity(intent);
     }
@@ -174,6 +232,35 @@ public class FileUtil {
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         context.startActivity(intent);
     }
+
+    /**
+     * 打开PDF资源
+     * @param context
+     * @param file
+     */
+    public static void openPDFIntent( Context context , File file ) {
+        Uri path = Uri.fromFile(file);
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.addCategory("android.intent.category.DEFAULT");
+        intent.setDataAndType(path, "application/pdf");
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        context.startActivity(intent);
+    }
+
+    /**
+     * 打开doc资源
+     * @param context
+     * @param file
+     */
+    public static void openDocIntent( Context context , File file ) {
+        Uri path = Uri.fromFile(file);
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.addCategory("android.intent.category.DEFAULT");
+        intent.setDataAndType(path, "application/msword");
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        context.startActivity(intent);
+    }
+
 
     /**
      * 打开文本资源

@@ -41,7 +41,7 @@ public class FileHolder extends RecyclerViewHolder<FileHolder> {
         FileType fileType = fileBean.getFileType();
         if (fileType == FileType.directory) {
             fileHolder.fileChildCount.setVisibility(View.VISIBLE);
-            fileHolder.fileChildCount.setText(fileBean.getChildCount() + "项");
+            fileHolder.fileChildCount.setText("文件: " +  fileBean.getSonFileCount() + ", 文件夹: " +fileBean.getSonFolderCount()  );
 
             fileHolder.fileSize.setVisibility(View.GONE);
             fileHolder.dir_enter_image.setVisibility(View.VISIBLE);

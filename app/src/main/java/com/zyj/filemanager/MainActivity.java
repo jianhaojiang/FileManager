@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
         //设置Title
         title_recycler_view = (RecyclerView) findViewById(R.id.title_recycler_view);
+        //表示水平布局，flase表示从左往右，LinearLayoutManager也可以将布局设置为网格布局
         title_recycler_view.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL , false ));
         titleAdapter = new TitleAdapter( MainActivity.this , new ArrayList<TitlePath>() ) ;
         title_recycler_view.setAdapter( titleAdapter );
@@ -76,6 +77,10 @@ public class MainActivity extends AppCompatActivity {
                         FileUtil.openMusicIntent( MainActivity.this ,  new File( file.getPath() ) );
                     }else if ( fileType == FileType.video ){
                         FileUtil.openVideoIntent( MainActivity.this ,  new File( file.getPath() ) );
+                    }else if ( fileType == FileType.pdf ){
+                        FileUtil.openPDFIntent( MainActivity.this ,  new File( file.getPath() ) );
+                    }else if ( fileType == FileType.doc ){
+                        FileUtil.openDocIntent( MainActivity.this ,  new File( file.getPath() ) );
                     }else {
                         FileUtil.openApplicationIntent( MainActivity.this , new File( file.getPath() ) );
                     }
@@ -129,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getFile(String path ) {
-        rootFile = new File( path + File.separator  )  ;
+        rootFile = new File( path + File.separator  );//File.separator表示当前系统的路径分隔符
         new MyTask(rootFile).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , "") ;
     }
 
@@ -148,21 +153,19 @@ public class MainActivity extends AppCompatActivity {
                 if ( filesArray != null ){
                     List<File> fileList = new ArrayList<>() ;
                     Collections.addAll( fileList , filesArray ) ;  //把数组转化成list
-                    Collections.sort( fileList , FileUtil.comparator );  //按照名字排序
-
+                    Collections.sort( fileList , FileUtil.comparator );  //按照名字排
                     for (File f : fileList ) {
                         if (f.isHidden()) continue;
-
                         FileBean fileBean = new FileBean();
                         fileBean.setName(f.getName());
                         fileBean.setPath(f.getAbsolutePath());
                         fileBean.setFileType( FileUtil.getFileType( f ));
                         fileBean.setChildCount( FileUtil.getFileChildCount( f ));
+                        fileBean.setSonFolderCount(FileUtil.getSonFloderCount(f));
+                        fileBean.setSonFileCount(FileUtil.getSonFileCount(f));
                         fileBean.setSize( f.length() );
                         fileBean.setHolderType( 0 );
-
                         fileBeenList.add(fileBean);
-
                         FileBean lineBean = new FileBean();
                         lineBean.setHolderType( 1 );
                         fileBeenList.add( lineBean );
@@ -191,9 +194,15 @@ public class MainActivity extends AppCompatActivity {
         filePath.setNameState( title + " > " );
         filePath.setPath( path );
         titleAdapter.addItem( filePath );
-        title_recycler_view.smoothScrollToPosition( titleAdapter.getItemCount());
+        title_recycler_view.smoothScrollToPosition( titleAdapter.getItemCount());//将RecyclerView滑动到指定位置
     }
 
+    /*监听手机back键
+        event.getRepeatCount() == 0意义：一些键(MediaKey,BackKey)在系统分发时，做了特殊处理:
+        当按下时，发送Message去调用KeyEvent.changeTimeRepeat
+        当长按住该键时，会发多次KeyEvent.ACTION_DOWN信号，第一次event.getRepeatCount()返回0;
+        第二次event.getRepeatCount()返回1;所以设置==0，可以避免长按时多次调用onKeyDown时的影响
+     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK

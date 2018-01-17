@@ -5,5 +5,5 @@ package com.zyj.filemanager.bean;
  */
 
 public enum  FileType {
-    directory , txt , zip , video , music , image ,apk , other
+    directory , txt , zip , video , music , image ,apk ,pdf,doc, other
 }

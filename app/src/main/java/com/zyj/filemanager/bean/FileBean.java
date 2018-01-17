@@ -9,6 +9,8 @@ public class FileBean {
     private String name;
     private String path;
     private FileType fileType;
+    private int sonFileCount;
+    private int sonFolderCount;
     private int childCount ;
     private long size ;
     private int holderType ;
@@ -60,4 +62,13 @@ public class FileBean {
     public void setHolderType(int holderType) {
         this.holderType = holderType;
     }
+
+    public int getSonFileCount() { return sonFileCount; }
+
+    public void setSonFileCount(int sonFileCount) { this.sonFileCount = sonFileCount; }
+
+    public int getSonFolderCount() { return sonFolderCount; }
+
+    public void setSonFolderCount(int sonFolderCount) { this.sonFolderCount = sonFolderCount; }
+
 }
