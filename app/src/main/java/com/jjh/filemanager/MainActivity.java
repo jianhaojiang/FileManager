@@ -1,5 +1,7 @@
-package com.zyj.filemanager;
+package com.jjh.filemanager;
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -10,21 +12,26 @@ import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.LinearLayout;
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.PermissionListener;
-import com.zyj.filemanager.adapter.FileHolder;
-import com.zyj.filemanager.adapter.FileAdapter;
-import com.zyj.filemanager.adapter.TitleAdapter;
-import com.zyj.filemanager.adapter.base.RecyclerViewAdapter;
-import com.zyj.filemanager.bean.FileBean;
-import com.zyj.filemanager.bean.TitlePath;
-import com.zyj.filemanager.bean.FileType;
+
+import com.jjh.filemanager.adapter.FileHolder;
+import com.jjh.filemanager.adapter.FileAdapter;
+import com.jjh.filemanager.adapter.TitleAdapter;
+import com.jjh.filemanager.adapter.base.RecyclerViewAdapter;
+import com.jjh.filemanager.bean.FileBean;
+import com.jjh.filemanager.bean.TitlePath;
+import com.jjh.filemanager.bean.FileType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.OnShowRationale;
+import permissions.dispatcher.PermissionRequest;
+import permissions.dispatcher.RuntimePermissions;
 
+
+@RuntimePermissions
 public class MainActivity extends AppCompatActivity {
     private RecyclerView title_recycler_view ;
     private RecyclerView recyclerView;
@@ -40,7 +47,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+//        // 无标题
+//        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         //设置Title
         title_recycler_view = (RecyclerView) findViewById(R.id.title_recycler_view);
         //表示水平布局，flase表示从左往右，LinearLayoutManager也可以将布局设置为网格布局
@@ -120,23 +128,28 @@ public class MainActivity extends AppCompatActivity {
 
         refreshTitleState( "内部存储设备" , rootPath );
 
-        // 先判断是否有权限。
-        if(AndPermission.hasPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE )) {
-            // 有权限，直接do anything.
-            getFile(rootPath);
-        } else {
-            //申请权限。
-            AndPermission.with(this)
-                    .requestCode(PERMISSION_CODE_WRITE_EXTERNAL_STORAGE)
-                    .permission(Manifest.permission.WRITE_EXTERNAL_STORAGE )
-                    .send();
-        }
+        //申请权限，使用的是PermissionsDispatcher框架
+        MainActivityPermissionsDispatcher.getMultiWithCheck(this);
+
+
+//        // 先判断是否有权限。
+//        if(AndPermission.hasPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE )) {
+//            // 有权限，直接do anything.
+//            getFile(rootPath);
+//        } else {
+//            //申请权限。
+//            AndPermission.with(this)
+//                    .requestCode(PERMISSION_CODE_WRITE_EXTERNAL_STORAGE)
+//                    .permission(Manifest.permission.WRITE_EXTERNAL_STORAGE )
+//                    .send();
+//        }
     }
 
     public void getFile(String path ) {
         rootFile = new File( path + File.separator  );//File.separator表示当前系统的路径分隔符
         new MyTask(rootFile).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , "") ;
     }
+
 
     class MyTask extends AsyncTask {
         File file;
@@ -220,29 +233,59 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        // 只需要调用这一句，其它的交给AndPermission吧，最后一个参数是PermissionListener。
-        AndPermission.onRequestPermissionsResult(requestCode, permissions, grantResults, listener);
+    //当权限通过时执行getMulti方法
+    @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
+    void getMulti() {
+        getFile(rootPath);
     }
 
-    private PermissionListener listener = new PermissionListener() {
-        @Override
-        public void onSucceed(int requestCode, List<String> grantedPermissions) {
-            // 权限申请成功回调。
-            if(requestCode == PERMISSION_CODE_WRITE_EXTERNAL_STORAGE ) {
-                getFile(rootPath);
-            }
-        }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        MainActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
 
-        @Override
-        public void onFailed(int requestCode, List<String> deniedPermissions) {
-            // 权限申请失败回调。
-            AndPermission.defaultSettingDialog( MainActivity.this, PERMISSION_CODE_WRITE_EXTERNAL_STORAGE )
-                    .setTitle("权限申请失败")
-                    .setMessage("我们需要的一些权限被您拒绝或者系统发生错误申请失败，请您到设置页面手动授权，否则功能无法正常使用！")
-                    .setPositiveButton("好，去设置")
-                    .show();
-        }
-    };
+    @OnShowRationale({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
+    void tt(final PermissionRequest request) {
+        new AlertDialog.Builder(this)
+                .setMessage("使用此功能需要同意读写文件的权限，否则无法正常使用")
+                .setPositiveButton("继续", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        request.proceed();//继续执行请求
+                    }
+                }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                request.cancel();//取消执行请求
+                finish();
+            }
+        }).show();
+    }
+
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        // 只需要调用这一句，其它的交给AndPermission吧，最后一个参数是PermissionListener。
+//        AndPermission.onRequestPermissionsResult(requestCode, permissions, grantResults, listener);
+//    }
+//
+//    private PermissionListener listener = new PermissionListener() {
+//        @Override
+//        public void onSucceed(int requestCode, List<String> grantedPermissions) {
+//            // 权限申请成功回调。
+//            if(requestCode == PERMISSION_CODE_WRITE_EXTERNAL_STORAGE ) {
+//                getFile(rootPath);
+//            }
+//        }
+//
+//        @Override
+//        public void onFailed(int requestCode, List<String> deniedPermissions) {
+//            // 权限申请失败回调。
+//            AndPermission.defaultSettingDialog( MainActivity.this, PERMISSION_CODE_WRITE_EXTERNAL_STORAGE )
+//                    .setTitle("权限申请失败")
+//                    .setMessage("我们需要的一些权限被您拒绝或者系统发生错误申请失败，请您到设置页面手动授权，否则功能无法正常使用！")
+//                    .setPositiveButton("好，去设置")
+//                    .show();
+//        }
+//    };
 }

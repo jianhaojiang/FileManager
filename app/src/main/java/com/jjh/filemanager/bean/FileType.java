@@ -1,4 +1,4 @@
-package com.zyj.filemanager.bean;
+package com.jjh.filemanager.bean;
 
 /**
  * Created by ${zhaoyanjun} on 2017/1/11.

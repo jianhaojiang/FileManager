@@ -1,12 +1,12 @@
-package com.zyj.filemanager.adapter;
+package com.jjh.filemanager.adapter;
 
 import android.view.View;
 import android.widget.TextView;
 
-import com.zyj.filemanager.R;
-import com.zyj.filemanager.adapter.base.RecyclerViewAdapter;
-import com.zyj.filemanager.adapter.base.RecyclerViewHolder;
-import com.zyj.filemanager.bean.TitlePath;
+import com.jjh.filemanager.R;
+import com.jjh.filemanager.adapter.base.RecyclerViewAdapter;
+import com.jjh.filemanager.adapter.base.RecyclerViewHolder;
+import com.jjh.filemanager.bean.TitlePath;
 
 /**
  * Created by ${zhaoyanjun} on 2017/1/12.

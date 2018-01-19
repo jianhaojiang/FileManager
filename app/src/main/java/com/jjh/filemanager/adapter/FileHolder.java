@@ -1,14 +1,14 @@
-package com.zyj.filemanager.adapter;
+package com.jjh.filemanager.adapter;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
-import com.zyj.filemanager.FileUtil;
-import com.zyj.filemanager.R;
-import com.zyj.filemanager.adapter.base.RecyclerViewAdapter;
-import com.zyj.filemanager.adapter.base.RecyclerViewHolder;
-import com.zyj.filemanager.bean.FileBean;
-import com.zyj.filemanager.bean.FileType;
+import com.jjh.filemanager.FileUtil;
+import com.jjh.filemanager.R;
+import com.jjh.filemanager.adapter.base.RecyclerViewAdapter;
+import com.jjh.filemanager.adapter.base.RecyclerViewHolder;
+import com.jjh.filemanager.bean.FileBean;
+import com.jjh.filemanager.bean.FileType;
 
 import java.io.File;
 

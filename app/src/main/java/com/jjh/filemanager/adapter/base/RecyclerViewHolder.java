@@ -1,4 +1,4 @@
-package com.zyj.filemanager.adapter.base;
+package com.jjh.filemanager.adapter.base;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;

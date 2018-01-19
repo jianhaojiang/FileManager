@@ -1,9 +1,9 @@
-package com.zyj.filemanager;
+package com.jjh.filemanager;
 
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import com.zyj.filemanager.bean.FileType;
+import com.jjh.filemanager.bean.FileType;
 import java.io.File;
 import java.util.Comparator;
 

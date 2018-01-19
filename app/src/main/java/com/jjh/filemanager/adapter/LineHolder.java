@@ -1,9 +1,9 @@
-package com.zyj.filemanager.adapter;
+package com.jjh.filemanager.adapter;
 
 import android.view.View;
 
-import com.zyj.filemanager.adapter.base.RecyclerViewAdapter;
-import com.zyj.filemanager.adapter.base.RecyclerViewHolder;
+import com.jjh.filemanager.adapter.base.RecyclerViewAdapter;
+import com.jjh.filemanager.adapter.base.RecyclerViewHolder;
 
 /**
  * Created by ${zhaoyanjun} on 2017/1/12.

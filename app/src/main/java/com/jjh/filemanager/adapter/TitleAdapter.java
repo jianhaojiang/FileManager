@@ -1,13 +1,13 @@
-package com.zyj.filemanager.adapter;
+package com.jjh.filemanager.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import com.zyj.filemanager.R;
-import com.zyj.filemanager.adapter.base.RecyclerViewAdapter;
-import com.zyj.filemanager.bean.TitlePath;
+import com.jjh.filemanager.R;
+import com.jjh.filemanager.adapter.base.RecyclerViewAdapter;
+import com.jjh.filemanager.bean.TitlePath;
 
 import java.util.List;
 
