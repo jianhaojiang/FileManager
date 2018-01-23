@@ -8,4 +8,23 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+
+    <style name="MainTags">
+        <item name="android:textSize">@dimen/tag_textSize</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/tag_text</item>
+        <item name="android:shadowColor">@color/tag_shadow</item>
+        <item name="android:shadowDx">1</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">1</item>
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/radio_bg</item>
+        <item name="android:button">@null</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:padding">@dimen/tag_pading</item>
+        <item name="android:drawablePadding">@dimen/tag_draw_pading</item>
+    </style>
+
+
 </resources>

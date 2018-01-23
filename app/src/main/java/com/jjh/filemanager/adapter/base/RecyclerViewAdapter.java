@@ -12,11 +12,11 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
 
 
     public interface OnItemClickListener {
-        void onItemClick(View view, RecyclerView.ViewHolder viewHolder , int position);
+        void onItemClick(View view, RecyclerView.ViewHolder viewHolder, int position);
     }
 
     public interface OnItemLongClickListener{
-        boolean onItemLongClick(View view , RecyclerView.ViewHolder viewHolder , int position);
+        boolean onItemLongClick(View view, RecyclerView.ViewHolder viewHolder, int position);
     }
 
     public FileAdapter.OnItemClickListener onItemClickListener;

@@ -3,4 +3,12 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="tag_text">#c5e5fb</color>
+    <color name="tag_shadow">#666666</color>
+
+    <color name="btn_stroke_normal">#111111</color>
+    <color name="btn_solid_normal">#11EEEEEE</color>
+
+    <color name="orangered">#E24D0D</color>
+    <color name="dimGray">#656666</color>
 </resources>

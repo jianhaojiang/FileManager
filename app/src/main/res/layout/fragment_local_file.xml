@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:background="@drawable/item_selector"
+        android:id="@+id/inside_storage"
+        android:onClick="onClick"
+        >
+
+        <ImageView
+            android:id="@+id/insideIcon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/file_icon_dir"
+            >
+        </ImageView>
+
+        <ImageView
+            android:id="@+id/inside_enter_image"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@mipmap/file_enter_icon"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            />
+
+        <RelativeLayout
+            android:layout_toLeftOf="@id/inside_enter_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/insideIcon"
+            android:layout_centerVertical="true"
+            android:gravity="left"
+            android:paddingLeft="15dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            >
+
+            <TextView
+                android:id="@+id/insideFileName"
+                android:layout_width="wrap_content"
+                android:gravity="left"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="#333333"
+                android:ellipsize="middle"
+                android:paddingBottom="1dp"
+                android:text="内部存储"
+                />
+
+            <TextView
+                android:id="@+id/insideFileSize"
+                android:layout_below="@id/insideFileName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:textColor="#999999"
+                android:gravity="center"
+                android:paddingTop="1dp"
+                android:text="总共：0GB，可用：0GB"
+                />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:background="@drawable/item_selector"
+        android:id="@+id/external_storage"
+        android:onClick="onClick"
+        >
+
+        <ImageView
+            android:id="@+id/externalFileIcon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/file_icon_dir"
+            >
+        </ImageView>
+
+        <ImageView
+            android:id="@+id/external_enter_image"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@mipmap/file_enter_icon"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            />
+
+        <RelativeLayout
+            android:layout_toLeftOf="@id/external_enter_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/externalFileIcon"
+            android:layout_centerVertical="true"
+            android:gravity="left"
+            android:paddingLeft="15dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            >
+
+            <TextView
+                android:id="@+id/externalFileName"
+                android:layout_width="wrap_content"
+                android:gravity="left"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="#333333"
+                android:ellipsize="middle"
+                android:paddingBottom="1dp"
+                android:text="外置SD卡存储"
+                />
+
+            <TextView
+                android:id="@+id/externalFileSize"
+                android:layout_below="@id/externalFileName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:textColor="#999999"
+                android:gravity="center"
+                android:paddingTop="1dp"
+                android:text="总共：0GB，可用：0GB"
+                />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>
