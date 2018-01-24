@@ -3,8 +3,11 @@ package com.jjh.filemanager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.storage.StorageManager;
+
 import com.jjh.filemanager.bean.FileType;
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.Comparator;
 
 /**
@@ -12,6 +15,30 @@ import java.util.Comparator;
  */
 
 public class FileUtil {
+
+
+    /**
+     * 得到所有的存储路径（内部存储+外部存储）
+     *
+     * @param context
+     * @return
+     */
+    public static String[] getAllSdPaths(Context context) {
+        Method mMethodGetPaths = null;
+        String[] paths = null;
+        //通过调用类的实例mStorageManager的getClass()获取StorageManager类对应的Class对象
+        //getMethod("getVolumePaths")返回StorageManager类对应的Class对象的getVolumePaths方法，这里不带参数
+        StorageManager mStorageManager = (StorageManager)context
+                .getSystemService(context.STORAGE_SERVICE);//storage
+        try {
+            mMethodGetPaths = mStorageManager.getClass().getMethod("getVolumePaths");
+            paths = (String[]) mMethodGetPaths.invoke(mStorageManager);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return paths;
+    }
 
     /**
      * 获取文件类型

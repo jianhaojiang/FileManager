@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -36,36 +37,49 @@ import permissions.dispatcher.RuntimePermissions;
 
 
 public class LocalFileActivity extends AppCompatActivity {
+
+    private static final String TAG="LocalFileActivity";
     private RecyclerView title_recycler_view ;
     private RecyclerView recyclerView;
     private FileAdapter fileAdapter;
     private List<FileBean> beanList = new ArrayList<>();
     private File rootFile ;
     private LinearLayout empty_rel ;
-    private int PERMISSION_CODE_WRITE_EXTERNAL_STORAGE = 100 ;
     private String rootPath ;
+    private String SDPath ;
+    private String[] Paths;
+    private int pathflag =-1;
     private TitleAdapter titleAdapter ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_local_file);
-//        // 无标题
-//        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        //初始化页面和监听
+        initView();
+        //根据点击路径浏览文件
+        browsePath();
+
+    }
+
+    public void initView(){
+        // 无标题
+        //supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         //设置Title
         title_recycler_view = (RecyclerView) findViewById(R.id.title_recycler_view);
+        //文件为空时显示该界面，不为空时隐藏
+        empty_rel = (LinearLayout) findViewById( R.id.empty_rel );
         //表示水平布局，flase表示从左往右，LinearLayoutManager也可以将布局设置为网格布局
         title_recycler_view.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL , false ));
         titleAdapter = new TitleAdapter( LocalFileActivity.this , new ArrayList<TitlePath>() ) ;
         title_recycler_view.setAdapter( titleAdapter );
-
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-
+        //初始化适配器
         fileAdapter = new FileAdapter(this, beanList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        //添加适配器
         recyclerView.setAdapter(fileAdapter);
-
-        empty_rel = (LinearLayout) findViewById( R.id.empty_rel );
 
         fileAdapter.setOnItemClickListener(new RecyclerViewAdapter.OnItemClickListener() {
             @Override
@@ -126,12 +140,32 @@ public class LocalFileActivity extends AppCompatActivity {
                 }
             }
         });
+    }
 
-        rootPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+    public void browsePath(){
+        //得到手机上的路径
+        Paths = FileUtil.getAllSdPaths(this);
+        rootPath = Paths[0];//rootPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+        SDPath = Paths[1];
 
-        refreshTitleState( "内部存储设备" , rootPath );
-        getFile(rootPath);
-
+        //根据点击的不同存储地址显示文件列表
+        pathflag = getIntent().getIntExtra("PathFlag", -1);
+        switch (pathflag){
+            case 0:
+                refreshTitleState( "内部存储设备" , rootPath );
+                getFile(rootPath);
+                break;
+            case 1:
+                refreshTitleState( "SD卡存储设备" , SDPath );
+                getFile(SDPath);
+                break;
+            case -1:
+                Log.e(TAG, "ERROR" );
+                Toast.makeText(this, "抱歉，程序异常请重试或重启！", Toast.LENGTH_LONG).show();
+                finish();
+                break;
+            default:
+        }
     }
 
     public void getFile(String path ) {

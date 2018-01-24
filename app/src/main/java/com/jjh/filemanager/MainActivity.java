@@ -29,6 +29,10 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     private ViewPager vp;
     private RadioGroup rgTabButtons;
+    private int pathFlag ;
+    private int InsideStorage =0;
+    private int ExternalStorage = 1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +55,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 //        //设置RadioGroup的第一个RadioButton为初始状态为选中状态
         ((RadioButton)rgTabButtons.getChildAt(0)).setChecked(true);
 
+
 //        //调用该语句申请权限，申请权限后执行getMulti方法
         MainActivityPermissionsDispatcher.getMultiWithCheck(this);
 
@@ -60,11 +65,17 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.inside_storage:
-                Intent intent = new Intent(MainActivity.this, LocalFileActivity.class);
-                startActivity(intent);
+                pathFlag = InsideStorage;
+                Intent insideIntent = new Intent(MainActivity.this, LocalFileActivity.class);
+                insideIntent.putExtra("PathFlag", pathFlag);
+                startActivity(insideIntent);
 //                finish();
                 break;
             case R.id.external_storage:
+                pathFlag = ExternalStorage;
+                Intent externalIntent = new Intent(MainActivity.this, LocalFileActivity.class);
+                externalIntent.putExtra("PathFlag", pathFlag);
+                startActivity(externalIntent);
                 break;
             default:
 
@@ -95,23 +106,23 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private RadioGroup.OnCheckedChangeListener onCheckedChangeListener=
             new RadioGroup.OnCheckedChangeListener() {
 
-        @Override
-        public void onCheckedChanged(RadioGroup group, int checkedId) {
-            //设置一个标签，用来记录当前所选的radioButton值
-            int checkedItem=0;
-            switch (checkedId) {
-                case R.id.rb_localFile:
-                    checkedItem=0;
-                    break;
-                case R.id.rb_classifyFile:
-                    checkedItem=1;
-                    break;
-            }
-            //将ViewPager的第checkedItem个页面设为当前屏幕的展示页面
-            vp.setCurrentItem(checkedItem);
-            //mCurrentFragment=checkedItem;
-        }
-    };
+                @Override
+                public void onCheckedChanged(RadioGroup group, int checkedId) {
+                    //设置一个标签，用来记录当前所选的radioButton值
+                    int checkedItem=0;
+                    switch (checkedId) {
+                        case R.id.rb_localFile:
+                            checkedItem=0;
+                            break;
+                        case R.id.rb_classifyFile:
+                            checkedItem=1;
+                            break;
+                    }
+                    //将ViewPager的第checkedItem个页面设为当前屏幕的展示页面
+                    vp.setCurrentItem(checkedItem);
+                    //mCurrentFragment=checkedItem;
+                }
+            };
 
     //以下是使用PermissionsDispatcher申请权限写的方法
     @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE,
