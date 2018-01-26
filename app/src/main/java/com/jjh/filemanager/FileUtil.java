@@ -3,12 +3,17 @@ package com.jjh.filemanager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Environment;
+import android.os.StatFs;
 import android.os.storage.StorageManager;
 
 import com.jjh.filemanager.bean.FileType;
 import java.io.File;
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Comparator;
+import java.util.Formatter;
 
 /**
  * Created by ${zhaoyanjun} on 2017/1/11.
@@ -18,7 +23,7 @@ public class FileUtil {
 
 
     /**
-     * 得到所有的存储路径（内部存储+外部存储）
+     * 得到所有的存储路径
      *
      * @param context
      * @return
@@ -38,6 +43,60 @@ public class FileUtil {
             e.printStackTrace();
         }
         return paths;
+    }
+
+    //得到外置SD卡的路径，来自网络
+    public static String getExtendedMemoryPath(Context mContext) {
+
+        StorageManager mStorageManager = (StorageManager) mContext.getSystemService(Context.STORAGE_SERVICE);
+        Class<?> storageVolumeClazz = null;
+        try {
+            storageVolumeClazz = Class.forName("android.os.storage.StorageVolume");
+            Method getVolumeList = mStorageManager.getClass().getMethod("getVolumeList");
+            Method getPath = storageVolumeClazz.getMethod("getPath");
+            Method isRemovable = storageVolumeClazz.getMethod("isRemovable");
+            Object result = getVolumeList.invoke(mStorageManager);
+            final int length = Array.getLength(result);
+            for (int i = 0; i < length; i++) {
+                Object storageVolumeElement = Array.get(result, i);
+                String path = (String) getPath.invoke(storageVolumeElement);
+                boolean removable = (Boolean) isRemovable.invoke(storageVolumeElement);
+                if (removable) {
+                    return path;
+                }
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static long getAvailSpace(String path) {
+        //获取可用内存大小
+        StatFs statfs=new StatFs(path);
+        //获取可用区块的个数
+        long count=statfs.getAvailableBlocks();
+        //获取区块大小
+        long size=statfs.getBlockSize();
+        //可用空间总大小
+        return count*size/1000/1000/1000;
+    }
+
+    public static long getAllSpace(String path) {
+        //获取总内存大小
+        StatFs statfs=new StatFs(path);
+        //获取总区块的个数
+        long count=statfs.getBlockCount();
+        //获取区块大小
+        long size=statfs.getBlockSize();
+        //可用空间总大小
+        return count*size/1000/1000/1000;
     }
 
     /**

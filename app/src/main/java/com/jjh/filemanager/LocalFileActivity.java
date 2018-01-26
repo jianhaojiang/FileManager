@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.StatFs;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -45,10 +46,8 @@ public class LocalFileActivity extends AppCompatActivity {
     private List<FileBean> beanList = new ArrayList<>();
     private File rootFile ;
     private LinearLayout empty_rel ;
-    private String rootPath ;
-    private String SDPath ;
-    private String[] Paths;
-    private int pathflag =-1;
+    private String Path ;
+    private int pathFlag;
     private TitleAdapter titleAdapter ;
 
     @Override
@@ -143,21 +142,20 @@ public class LocalFileActivity extends AppCompatActivity {
     }
 
     public void browsePath(){
-        //得到手机上的路径
-        Paths = FileUtil.getAllSdPaths(this);
-        rootPath = Paths[0];//rootPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        SDPath = Paths[1];
-
+//      得到手机上的所有路径
+//      String[] Paths = FileUtil.getAllSdPaths(this);
+//      String rootPath = Paths[0];
+//      String SDPath =Paths[1];
+//      Log.e(TAG, "browsePath: " + SDPath );
         //根据点击的不同存储地址显示文件列表
-        pathflag = getIntent().getIntExtra("PathFlag", -1);
-        switch (pathflag){
+        Path = getIntent().getStringExtra("Path");
+        pathFlag = getIntent().getIntExtra("flagPath", -1);
+        switch (pathFlag){
             case 0:
-                refreshTitleState( "内部存储设备" , rootPath );
-                getFile(rootPath);
+                refreshTitleState( "内部存储设备" , Path );
                 break;
             case 1:
-                refreshTitleState( "SD卡存储设备" , SDPath );
-                getFile(SDPath);
+                refreshTitleState( "SD卡存储设备" , Path );
                 break;
             case -1:
                 Log.e(TAG, "ERROR" );
@@ -166,6 +164,7 @@ public class LocalFileActivity extends AppCompatActivity {
                 break;
             default:
         }
+        getFile(Path);
     }
 
     public void getFile(String path ) {

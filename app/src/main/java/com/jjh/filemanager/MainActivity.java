@@ -4,6 +4,8 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -11,12 +13,18 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.jjh.filemanager.bean.FileBean;
 import com.jjh.filemanager.fragment.adapter.FragAdapter;
 import com.jjh.filemanager.fragment.classifyFileFragment;
 import com.jjh.filemanager.fragment.localFileFragment;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import permissions.dispatcher.NeedsPermission;
@@ -29,16 +37,19 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     private ViewPager vp;
     private RadioGroup rgTabButtons;
-    private int pathFlag ;
-    private int InsideStorage =0;
-    private int ExternalStorage = 1;
-
+    private String SDPath;
+    private String rootPath;
+    private int flagPath = -1;
+    private int INSIDE_STORAGE = 0;
+    private int EXTERNAL_STORAGE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //调用该语句申请权限，申请权限后执行getMulti方法
+        MainActivityPermissionsDispatcher.getMultiWithCheck(this);
         //构造适配器
         List<Fragment> fragments = new ArrayList<Fragment>();
         fragments.add(new localFileFragment());
@@ -52,30 +63,87 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
         rgTabButtons = (RadioGroup)findViewById(R.id.rgTabBtns);
         rgTabButtons.setOnCheckedChangeListener(onCheckedChangeListener);
-//        //设置RadioGroup的第一个RadioButton为初始状态为选中状态
+        //设置RadioGroup的第一个RadioButton为初始状态为选中状态
         ((RadioButton)rgTabButtons.getChildAt(0)).setChecked(true);
-
-
-//        //调用该语句申请权限，申请权限后执行getMulti方法
-        MainActivityPermissionsDispatcher.getMultiWithCheck(this);
-
+        //不建议在onCreate刷新UI,而且这里刷新不了ViewPager里的Fragment子控件，只有在PagerView显示后才行即onCreate运行结束，于是在AsyncTask里面刷新
+        new RefreshTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , "") ;
     }
+
+    class RefreshTask extends AsyncTask {
+        private FragAdapter myAdapter;
+        private localFileFragment firstFragment;
+        private RelativeLayout externalStorage;
+        private TextView insideFileSize;
+        private TextView externalFileSize;
+        private String insideInfo;
+        private String externalInfo;
+
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+            try{
+                Thread.sleep(100);//等待onCreate结束再执行刷新界面的作用
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            rootPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+            SDPath = FileUtil.getExtendedMemoryPath(MainActivity.this);
+            if(rootPath != null){
+                insideInfo = "总共：" + FileUtil.getAllSpace(rootPath) + "GB，可用："
+                        + FileUtil.getAvailSpace(rootPath) + "GB";
+            }else {
+                insideInfo = "总共：0GB，可用：0GB";
+            }
+            if(SDPath != null){
+                externalInfo = "总共：" + FileUtil.getAllSpace(SDPath) + "GB，可用："
+                        + FileUtil.getAvailSpace(SDPath) + "GB";
+            }else {
+                externalInfo = "总共：0GB，可用：0GB";
+            }
+            return SDPath;
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            myAdapter = (FragAdapter)vp.getAdapter();
+            firstFragment = (localFileFragment)myAdapter.getItem(0);
+            //RelativeLayout externalStorage = (RelativeLayout)findViewById(R.id.external_storage);//直接这样写也可以得到
+            externalStorage = (RelativeLayout)firstFragment.getActivity().findViewById(R.id.external_storage);
+            insideFileSize = (TextView)firstFragment.getActivity().findViewById(R.id.insideFileSize);
+            externalFileSize = (TextView)firstFragment.getActivity().findViewById(R.id.externalFileSize);
+            //如果没有外置SD卡则不显示SD卡选项
+            if(SDPath == null){
+                externalStorage.setVisibility(View.GONE);
+            }else {
+                externalStorage.setVisibility(View.VISIBLE);
+            }
+            insideFileSize.setText(insideInfo);
+            externalFileSize.setText(externalInfo);
+        }
+    }
+
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.inside_storage:
-                pathFlag = InsideStorage;
+                flagPath = INSIDE_STORAGE;
                 Intent insideIntent = new Intent(MainActivity.this, LocalFileActivity.class);
-                insideIntent.putExtra("PathFlag", pathFlag);
+                insideIntent.putExtra("Path", rootPath);
+                insideIntent.putExtra("flagPath", flagPath);
                 startActivity(insideIntent);
 //                finish();
                 break;
             case R.id.external_storage:
-                pathFlag = ExternalStorage;
-                Intent externalIntent = new Intent(MainActivity.this, LocalFileActivity.class);
-                externalIntent.putExtra("PathFlag", pathFlag);
-                startActivity(externalIntent);
+                if(SDPath == null){
+                    Toast.makeText(this, "没有检测到SD卡！", Toast.LENGTH_LONG).show();
+                }else {
+                    flagPath = EXTERNAL_STORAGE;
+                    Intent externalIntent = new Intent(MainActivity.this, LocalFileActivity.class);
+                    externalIntent.putExtra("Path", SDPath);
+                    externalIntent.putExtra("flagPath", flagPath);
+                    startActivity(externalIntent);
+                }
                 break;
             default:
 
@@ -120,7 +188,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     }
                     //将ViewPager的第checkedItem个页面设为当前屏幕的展示页面
                     vp.setCurrentItem(checkedItem);
-                    //mCurrentFragment=checkedItem;
                 }
             };
 

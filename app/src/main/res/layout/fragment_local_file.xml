@@ -76,6 +76,7 @@
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/external_storage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="5dp"
@@ -83,7 +84,6 @@
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:background="@drawable/item_selector"
-        android:id="@+id/external_storage"
         android:onClick="onClick"
         >
 
@@ -139,6 +139,76 @@
                 android:gravity="center"
                 android:paddingTop="1dp"
                 android:text="总共：0GB，可用：0GB"
+                />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:background="@drawable/item_selector"
+        android:id="@+id/private_storage"
+        android:onClick="onClick"
+        >
+
+        <ImageView
+            android:id="@+id/privateFileIcon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/file_icon_dir"
+            >
+        </ImageView>
+
+        <ImageView
+            android:id="@+id/private_enter_image"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@mipmap/file_enter_icon"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            />
+
+        <RelativeLayout
+            android:layout_toLeftOf="@id/private_enter_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/privateFileIcon"
+            android:layout_centerVertical="true"
+            android:gravity="left"
+            android:paddingLeft="15dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            >
+
+            <TextView
+                android:id="@+id/privateFileName"
+                android:layout_width="wrap_content"
+                android:gravity="left"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="#333333"
+                android:ellipsize="middle"
+                android:paddingBottom="1dp"
+                android:text="私人存储"
+                />
+
+            <TextView
+                android:id="@+id/privateFileSize"
+                android:layout_below="@id/privateFileName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:textColor="#999999"
+                android:gravity="center"
+                android:paddingTop="1dp"
+                android:text="0项"
                 />
 
         </RelativeLayout>
