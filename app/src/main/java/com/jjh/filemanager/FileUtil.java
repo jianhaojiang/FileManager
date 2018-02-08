@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Comparator;
 import java.util.Formatter;
+import java.util.Formatter.*;
 
 /**
  * Created by ${zhaoyanjun} on 2017/1/11.
@@ -77,26 +78,46 @@ public class FileUtil {
         return null;
     }
 
-    public static long getAvailSpace(String path) {
+
+    /*
+    getAvailableBlocksLong()
+    文件系统中可被应用程序使用的空闲存储区块的数量
+    getBlockCountLong()
+    文件系统中总的存储区块的数量
+    getBlockSizeLong()
+    文件系统中每个存储区块的字节数
+    getFreeBlocksLong()
+    文件系统中总的空闲存储区块的数量，包括保留的存储区块（不能被普通应用程序使用）
+
+    getFreeBytes()
+    文件系统中总的空闲字节数，包括保留的存储区块（不能被普通应用程序使用）
+    getTotalBytes()
+    文件系统支持的总的存储字节数
+    getAvailableBytes()
+    文件系统中可被应用程序使用的空闲字节数
+     */
+    public static String getAvailSpace(Context context, String path) {
         //获取可用内存大小
         StatFs statfs=new StatFs(path);
         //获取可用区块的个数
-        long count=statfs.getAvailableBlocks();
-        //获取区块大小
-        long size=statfs.getBlockSize();
+//        long count=statfs.getAvailableBlocksLong();
+//        //获取每个区块大小
+//        long size=statfs.getBlockSizeLong();
+        String FileSize = android.text.format.Formatter.formatFileSize(context, statfs.getAvailableBytes());
         //可用空间总大小
-        return count*size/1000/1000/1000;
+        return FileSize;
     }
 
-    public static long getAllSpace(String path) {
-        //获取总内存大小
+    public static String getAllSpace(Context context, String path) {
+        //获取总内存大小,不包含固件大小。
         StatFs statfs=new StatFs(path);
-        //获取总区块的个数
-        long count=statfs.getBlockCount();
-        //获取区块大小
-        long size=statfs.getBlockSize();
-        //可用空间总大小
-        return count*size/1000/1000/1000;
+//        //获取总区块的个数
+//        long count=statfs.getBlockCountLong();
+//        //获取每个区块大小
+//        long size=statfs.getBlockSizeLong();
+        //支持空间总大小
+        String FileSize = android.text.format.Formatter.formatFileSize(context, statfs.getTotalBytes());
+        return FileSize;
     }
 
     /**

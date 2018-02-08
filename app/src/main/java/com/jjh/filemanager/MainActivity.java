@@ -25,6 +25,7 @@ import com.jjh.filemanager.fragment.localFileFragment;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Formatter;
 import java.util.List;
 
 import permissions.dispatcher.NeedsPermission;
@@ -39,6 +40,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private RadioGroup rgTabButtons;
     private String SDPath;
     private String rootPath;
+    private String totalPath;
     private int flagPath = -1;
     private int INSIDE_STORAGE = 0;
     private int EXTERNAL_STORAGE = 1;
@@ -86,17 +88,18 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             }catch (Exception e){
                 e.printStackTrace();
             }
-            rootPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+            rootPath = Environment.getExternalStorageDirectory().getAbsolutePath();//手机自带外部存储根目录
+            totalPath = Environment.getDataDirectory().getPath();  //手机所有文件根目录
             SDPath = FileUtil.getExtendedMemoryPath(MainActivity.this);
             if(rootPath != null){
-                insideInfo = "总共：" + FileUtil.getAllSpace(rootPath) + "GB，可用："
-                        + FileUtil.getAvailSpace(rootPath) + "GB";
+                insideInfo = "总共：" + FileUtil.getAllSpace(MainActivity.this, totalPath) + "，可用："
+                        + FileUtil.getAvailSpace(MainActivity.this, totalPath) ;
             }else {
                 insideInfo = "总共：0GB，可用：0GB";
             }
             if(SDPath != null){
-                externalInfo = "总共：" + FileUtil.getAllSpace(SDPath) + "GB，可用："
-                        + FileUtil.getAvailSpace(SDPath) + "GB";
+                externalInfo = "总共：" + FileUtil.getAllSpace(MainActivity.this, SDPath) + "，可用："
+                        + FileUtil.getAvailSpace(MainActivity.this, SDPath) ;
             }else {
                 externalInfo = "总共：0GB，可用：0GB";
             }
@@ -112,6 +115,14 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             insideFileSize = (TextView)firstFragment.getActivity().findViewById(R.id.insideFileSize);
             externalFileSize = (TextView)firstFragment.getActivity().findViewById(R.id.externalFileSize);
             //如果没有外置SD卡则不显示SD卡选项
+
+//            if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+//                //检测手机自带的外部存储是否装载
+//                externalStorage.setVisibility(View.VISIBLE);
+//            }else {
+//                externalStorage.setVisibility(View.GONE);
+//            }
+
             if(SDPath == null){
                 externalStorage.setVisibility(View.GONE);
             }else {

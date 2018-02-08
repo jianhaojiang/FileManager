@@ -79,7 +79,6 @@ public class LocalFileActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         //添加适配器
         recyclerView.setAdapter(fileAdapter);
-
         fileAdapter.setOnItemClickListener(new RecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, RecyclerView.ViewHolder viewHolder, int position) {
