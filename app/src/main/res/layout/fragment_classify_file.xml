@@ -1,6 +1,350 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/GridLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:rowCount="2"
+        android:columnCount="3"
+        android:gravity="center_horizontal"
+        android:stretchMode="spacingWidth"
+        android:orientation="vertical">
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/classify_music"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="7dp"
+            android:background="@drawable/item_selector"
+            android:onClick="onClick"
+            >
 
+            <ImageView
+                android:id="@+id/classify_music_image"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_centerVertical="true"
+                android:src="@mipmap/classify_icon_music"
+                >
+            </ImageView>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/classify_music_image"
+                android:layout_centerVertical="true"
+                android:gravity="left"
+                android:padding="3dp"
+                >
+                <TextView
+                    android:id="@+id/classify_music_name"
+                    android:layout_width="46dp"
+                    android:gravity="left"
+                    android:layout_height="23dp"
+                    android:textSize="14sp"
+                    android:textColor="#333333"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="1dp"
+                    android:text="音乐"
+                    />
+
+                <TextView
+                    android:id="@+id/classify_music_number"
+                    android:layout_below="@id/classify_music_name"
+                    android:layout_width="46dp"
+                    android:layout_height="23dp"
+                    android:textSize="14sp"
+                    android:textColor="#999999"
+                    android:gravity="left"
+                    android:paddingTop="1dp"
+                    android:text="(0)"
+                    />
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/classify_video"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="7dp"
+            android:background="@drawable/item_selector"
+            android:onClick="onClick"
+            >
+
+            <ImageView
+                android:id="@+id/classify_video_image"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_centerVertical="true"
+                android:src="@mipmap/classify_icon_video"
+                >
+            </ImageView>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/classify_video_image"
+                android:layout_centerVertical="true"
+                android:gravity="left"
+                android:padding="3dp"
+                >
+
+                <TextView
+                    android:id="@+id/classify_video_name"
+                    android:layout_width="46dp"
+                    android:layout_height="23dp"
+                    android:gravity="left"
+                    android:textSize="14sp"
+                    android:textColor="#333333"
+                    android:ellipsize="middle"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="1dp"
+                    android:text="视频"
+                    />
+
+                <TextView
+                    android:id="@+id/classify_video_number"
+                    android:layout_below="@id/classify_video_name"
+                    android:layout_width="46dp"
+                    android:layout_height="23dp"
+                    android:textSize="14sp"
+                    android:textColor="#999999"
+                    android:gravity="left"
+                    android:paddingTop="1dp"
+                    android:text="(0)"
+                    />
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/classify_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="7dp"
+            android:background="@drawable/item_selector"
+            android:onClick="onClick"
+            >
+
+            <ImageView
+                android:id="@+id/classify_image_image"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_centerVertical="true"
+                android:src="@mipmap/classify_icon_image"
+                >
+            </ImageView>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/classify_image_image"
+                android:layout_centerVertical="true"
+                android:gravity="left"
+                android:padding="3dp"
+                >
+
+                <TextView
+                    android:id="@+id/classify_image_name"
+                    android:layout_width="46dp"
+                    android:layout_height="23dp"
+                    android:gravity="left"
+                    android:textSize="14sp"
+                    android:textColor="#333333"
+                    android:ellipsize="middle"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="1dp"
+                    android:text="图片"
+                    />
+
+                <TextView
+                    android:id="@+id/classify_image_number"
+                    android:layout_below="@id/classify_image_name"
+                    android:layout_width="46dp"
+                    android:layout_height="23dp"
+                    android:textSize="14sp"
+                    android:textColor="#999999"
+                    android:gravity="left"
+                    android:paddingTop="1dp"
+                    android:text="(0)"
+                    />
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/classify_installpackage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="7dp"
+            android:background="@drawable/item_selector"
+            android:onClick="onClick"
+            >
+
+            <ImageView
+                android:id="@+id/classify_installpackage_image"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_centerVertical="true"
+                android:src="@mipmap/classify_icon_installpackage"
+                >
+            </ImageView>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/classify_installpackage_image"
+                android:layout_centerVertical="true"
+                android:gravity="left"
+                android:padding="3dp"
+                >
+
+                <TextView
+                    android:id="@+id/classify_installpackage_name"
+                    android:layout_width="46dp"
+                    android:layout_height="23dp"
+                    android:gravity="left"
+                    android:textSize="14sp"
+                    android:textColor="#333333"
+                    android:ellipsize="middle"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="1dp"
+                    android:text="安装包"
+                    />
+
+                <TextView
+                    android:id="@+id/classify_installpackage_number"
+                    android:layout_below="@id/classify_installpackage_name"
+                    android:layout_width="46dp"
+                    android:layout_height="23dp"
+                    android:textSize="14sp"
+                    android:textColor="#999999"
+                    android:gravity="left"
+                    android:paddingTop="1dp"
+                    android:text="(0)"
+                    />
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/classify_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="7dp"
+            android:background="@drawable/item_selector"
+            android:onClick="onClick"
+            >
+
+            <ImageView
+                android:id="@+id/classify_txt_image"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_centerVertical="true"
+                android:src="@mipmap/classify_icon_txt"
+                >
+            </ImageView>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/classify_txt_image"
+                android:layout_centerVertical="true"
+                android:gravity="left"
+                android:padding="3dp"
+                >
+
+                <TextView
+                    android:id="@+id/classify_txt_name"
+                    android:layout_width="46dp"
+                    android:layout_height="23dp"
+                    android:gravity="left"
+                    android:textSize="14sp"
+                    android:textColor="#333333"
+                    android:ellipsize="middle"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="1dp"
+                    android:text="文档"
+                    />
+
+                <TextView
+                    android:id="@+id/classify_txt_number"
+                    android:layout_below="@id/classify_txt_name"
+                    android:layout_width="46dp"
+                    android:layout_height="23dp"
+                    android:textSize="14sp"
+                    android:textColor="#999999"
+                    android:gravity="left"
+                    android:paddingTop="1dp"
+                    android:text="(0)"
+                    />
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/classify_zip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="7dp"
+            android:background="@drawable/item_selector"
+            android:onClick="onClick"
+            >
+
+            <ImageView
+                android:id="@+id/classify_zip_image"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_centerVertical="true"
+                android:src="@mipmap/classify_icon_zip"
+                >
+            </ImageView>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/classify_zip_image"
+                android:layout_centerVertical="true"
+                android:gravity="left"
+                android:padding="3dp"
+                >
+
+                <TextView
+                    android:id="@+id/classify_zip_name"
+                    android:layout_width="46dp"
+                    android:layout_height="22dp"
+                    android:gravity="left"
+                    android:textSize="14sp"
+                    android:textColor="#333333"
+                    android:ellipsize="middle"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="1dp"
+                    android:text="压缩包"
+                    />
+
+                <TextView
+                    android:id="@+id/classify_zip_number"
+                    android:layout_below="@id/classify_zip_name"
+                    android:layout_width="46dp"
+                    android:layout_height="23dp"
+                    android:textSize="14sp"
+                    android:textColor="#999999"
+                    android:gravity="left"
+                    android:text="(0)"
+                    />
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+    </GridLayout>
 </LinearLayout>

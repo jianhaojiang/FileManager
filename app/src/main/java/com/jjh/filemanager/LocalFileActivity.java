@@ -198,6 +198,7 @@ public class LocalFileActivity extends AppCompatActivity {
                         fileBean.setSonFolderCount(FileUtil.getSonFloderCount(f));
                         fileBean.setSonFileCount(FileUtil.getSonFileCount(f));
                         fileBean.setSize( f.length() );
+                        fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
                         fileBean.setHolderType( 0 );
                         fileBeenList.add(fileBean);
                         FileBean lineBean = new FileBean();

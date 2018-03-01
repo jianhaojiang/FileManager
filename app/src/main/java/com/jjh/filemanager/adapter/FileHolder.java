@@ -23,6 +23,7 @@ public class FileHolder extends RecyclerViewHolder<FileHolder> {
     TextView fileChildCount;
     TextView fileSize;
     ImageView dir_enter_image;
+    TextView fileDate;
 
     public FileHolder(View view) {
         super(view);
@@ -31,6 +32,7 @@ public class FileHolder extends RecyclerViewHolder<FileHolder> {
         fileChildCount = (TextView) view.findViewById(R.id.fileChildCount);
         fileSize = (TextView) view.findViewById(R.id.fileSize);
         dir_enter_image = (ImageView) view.findViewById(R.id.dir_enter_image);
+        fileDate = (TextView) view.findViewById(R.id.fileDate);
     }
 
     @Override
@@ -45,14 +47,15 @@ public class FileHolder extends RecyclerViewHolder<FileHolder> {
 
             fileHolder.fileSize.setVisibility(View.GONE);
             fileHolder.dir_enter_image.setVisibility(View.VISIBLE);
-
+            fileHolder.fileDate.setVisibility(View.GONE);
         } else {
             fileHolder.fileChildCount.setVisibility(View.GONE);
 
             fileHolder.fileSize.setVisibility(View.VISIBLE);
             fileHolder.fileSize.setText(FileUtil.sizeToChange(fileBean.getSize()));
-
             fileHolder.dir_enter_image.setVisibility(View.GONE);
+            fileHolder.fileDate.setVisibility(View.VISIBLE);
+            fileHolder.fileDate.setText(fileBean.getDate());
         }
 
         //设置图标

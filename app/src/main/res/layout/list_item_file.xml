@@ -27,6 +27,16 @@
         android:layout_centerVertical="true"
         />
 
+    <TextView
+        android:id="@+id/fileDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:gravity="bottom"
+        android:textSize="10sp"
+        android:textColor="#999999" />
+
     <RelativeLayout
         android:layout_toLeftOf="@id/dir_enter_image"
         android:layout_width="match_parent"

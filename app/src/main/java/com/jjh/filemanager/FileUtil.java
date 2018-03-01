@@ -12,16 +12,91 @@ import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Formatter;
 import java.util.Formatter.*;
+import android.content.ContentResolver;
+import android.database.Cursor;
+import android.provider.MediaStore.Files;
+import android.provider.MediaStore.Files.FileColumns;
+import android.util.Log;
 
 /**
- * Created by ${zhaoyanjun} on 2017/1/11.
+ * Created by jjh on 2017.
  */
 
 public class FileUtil {
 
+    /*
+    传入Context和文件类型，获取文件
+     */
+    public static void getSpecificTypeOfFile(Context context,String[] extension)
+    {
+        //从外存中获取
+        Uri fileUri=Files.getContentUri("external");
+        //筛选列，这里只筛选了：文件路径和不含后缀的文件名
+        String[] projection=new String[]{
+                FileColumns.DATA,FileColumns.TITLE
+        };
+        //构造筛选语句
+        String selection="";
+        for(int i=0;i<extension.length;i++)
+        {
+            if(i!=0)
+            {
+                selection=selection+" OR ";
+            }
+            selection=selection+FileColumns.DATA+" LIKE '%"+extension[i]+"'";
+        }
+        //按时间递增顺序对结果进行排序;待会从后往前移动游标就可实现时间递减
+        String sortOrder=FileColumns.DATE_MODIFIED;
+        //获取内容解析器对象
+        ContentResolver resolver=context.getContentResolver();
+        //获取游标
+        Cursor cursor=resolver.query(fileUri, projection, selection, null, sortOrder);
+        if(cursor==null)
+            return;
+        //游标从最后开始往前递减，以此实现时间递减顺序（最近访问的文件，优先显示）
+        if(cursor.moveToLast())
+        {
+            do{
+                //输出文件的完整路径
+                String data=cursor.getString(0);
+                Log.d("tag", data);
+            }while(cursor.moveToPrevious());
+        }
+        cursor.close();
+
+    }
+
+    /**
+     * 字符串时间戳转时间格式
+     *
+     * @param timeStamp
+     * @return
+     */
+    public static String getStrTime(String timeStamp) {
+        String timeString = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 hh:mm");
+        long l = Long.valueOf(timeStamp) * 1000;
+        timeString = sdf.format(new Date(l));
+        return timeString;
+    }
+
+    /**
+     * 读取文件的最后修改时间的方法
+     */
+    public static String getFileLastModifiedTime(File f) {
+        Calendar cal = Calendar.getInstance();
+        long time = f.lastModified();
+        SimpleDateFormat formatter = new
+                SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        cal.setTimeInMillis(time);
+        return formatter.format(cal.getTime());
+    }
 
     /**
      * 得到所有的存储路径
