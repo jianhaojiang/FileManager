@@ -187,9 +187,9 @@ public class LocalFileActivity extends AppCompatActivity {
                 if ( filesArray != null ){
                     List<File> fileList = new ArrayList<>() ;
                     Collections.addAll( fileList , filesArray ) ;  //把数组转化成list
-                    Collections.sort( fileList , FileUtil.comparator );  //按照名字排
+                    Collections.sort( fileList , FileUtil.comparator );  //自定义排序
                     for (File f : fileList ) {
-                        if (f.isHidden()) continue;
+                       if (f.isHidden()) continue;
                         FileBean fileBean = new FileBean();
                         fileBean.setName(f.getName());
                         fileBean.setPath(f.getAbsolutePath());

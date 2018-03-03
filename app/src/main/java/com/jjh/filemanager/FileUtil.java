@@ -7,19 +7,24 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.os.storage.StorageManager;
 
+import com.jjh.filemanager.bean.FileBean;
 import com.jjh.filemanager.bean.FileType;
 import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Formatter;
 import java.util.Formatter.*;
+import java.util.List;
+
 import android.content.ContentResolver;
 import android.database.Cursor;
+import android.provider.MediaStore;
 import android.provider.MediaStore.Files;
 import android.provider.MediaStore.Files.FileColumns;
 import android.util.Log;
@@ -30,10 +35,296 @@ import android.util.Log;
 
 public class FileUtil {
 
+
+    public static List<FileBean> getAllPhoto(Context mContext) {
+
+        ContentResolver mContentResolver =  mContext.getContentResolver();
+
+        List<FileBean> photos = new ArrayList<>();
+
+        String[] projection = new String[]{
+                MediaStore.Images.ImageColumns.DATA,};
+        //MediaStore.Images.ImageColumns._ID, MediaStore.Images.ImageColumns.DISPLAY_NAME
+
+        // asc 按升序排列
+        // desc 按降序排列
+        //projection 是定义返回的数据，selection 通常的sql 语句，例如
+        // selection=MediaStore.Images.ImageColumns.MIME_TYPE+"=? " 那么 selectionArgs=new String[]{"jpg"};
+        Cursor cursor = mContentResolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                projection, null, null, MediaStore.Images.ImageColumns.DATE_MODIFIED + "  desc");
+
+//        String imageId ;
+//        String fileName;
+
+        while (cursor.moveToNext()) {
+
+//            imageId = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns._ID));
+//            fileName = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME));
+
+            String filePath = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA));
+
+            File f = new File(filePath);
+            FileBean fileBean = new FileBean();
+            fileBean.setName(f.getName());
+            fileBean.setPath(filePath);
+            fileBean.setFileType( FileType.image);
+//            fileBean.setChildCount(0);int在类中默认初始化值为0
+//            fileBean.setSonFolderCount(0);
+//            fileBean.setSonFileCount(0);
+            fileBean.setSize( f.length() );
+            fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
+            fileBean.setHolderType( 0 );
+            photos.add(fileBean);
+            FileBean lineBean = new FileBean();
+            lineBean.setHolderType( 1 );
+            photos.add( lineBean );
+
+//            Log.e("phone_photo",  " -- " + filePath);
+        }
+        cursor.close();
+
+        cursor = null;
+
+        return photos;
+
+    }
+
+    public static List<FileBean> getAllMusic(Context mContext) {
+
+        ContentResolver mContentResolver =  mContext.getContentResolver();
+        List<FileBean> musics = new ArrayList<>();
+
+
+        String[] projection = new String[]{MediaStore.Audio.AudioColumns.DATA};
+
+
+        Cursor cursor = mContentResolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection,
+                null, null, MediaStore.Audio.AudioColumns.DATE_MODIFIED + " desc");
+
+
+
+        while (cursor.moveToNext()) {
+
+            String filePath = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DATA));
+
+            File f = new File(filePath);
+            FileBean fileBean = new FileBean();
+            fileBean.setName(f.getName());
+            fileBean.setPath(filePath);
+            fileBean.setFileType( FileType.music);
+//            fileBean.setChildCount(0);int在类中默认初始化值为0
+//            fileBean.setSonFolderCount(0);
+//            fileBean.setSonFileCount(0);
+            fileBean.setSize( f.length() );
+            fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
+            fileBean.setHolderType( 0 );
+            musics.add(fileBean);
+            FileBean lineBean = new FileBean();
+            lineBean.setHolderType( 1 );
+            musics.add( lineBean );
+
+        }
+
+        cursor.close();
+
+        cursor = null;
+
+        return musics;
+
+    }
+
+    public static List<FileBean> getAllVideo(Context mContext) {
+
+        ContentResolver mContentResolver =  mContext.getContentResolver();
+
+        List<FileBean> videos = new ArrayList<>();
+
+
+        String[] projection = new String[]{MediaStore.Video.VideoColumns.DATA};
+
+
+        Cursor cursor = mContentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                projection, null, null, MediaStore.Video.VideoColumns.DATE_MODIFIED + " desc");
+
+
+        while (cursor.moveToNext()) {
+
+            String filePath = cursor.getString(cursor.getColumnIndex(MediaStore.Video.VideoColumns.DATA));
+
+
+            File f = new File(filePath);
+            FileBean fileBean = new FileBean();
+            fileBean.setName(f.getName());
+            fileBean.setPath(filePath);
+            fileBean.setFileType( FileType.video);
+//            fileBean.setChildCount(0);int在类中默认初始化值为0
+//            fileBean.setSonFolderCount(0);
+//            fileBean.setSonFileCount(0);
+            fileBean.setSize( f.length() );
+            fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
+            fileBean.setHolderType( 0 );
+            videos.add(fileBean);
+            FileBean lineBean = new FileBean();
+            lineBean.setHolderType( 1 );
+            videos.add( lineBean );
+
+
+        }
+
+        cursor.close();
+        cursor = null;
+
+        return videos;
+
+    }
+
+    public static List<FileBean> getAllText(Context mContext) {
+
+        ContentResolver mContentResolver =  mContext.getContentResolver();
+
+        List<FileBean> texts = new ArrayList<>();
+
+        String[] projection = new String[]{FileColumns.DATA};
+
+        String selection = MediaStore.Files.FileColumns.MIME_TYPE + "= ? "
+                + " or " + MediaStore.Files.FileColumns.MIME_TYPE + " = ? "
+                + " or " + MediaStore.Files.FileColumns.MIME_TYPE + " = ? "
+                + " or " + MediaStore.Files.FileColumns.MIME_TYPE + " = ? "
+                + " or " + MediaStore.Files.FileColumns.MIME_TYPE + " = ? ";
+
+        String[] selectionArgs = new String[]{"text/plain", "application/msword",
+                "application/pdf", "application/vnd.ms-powerpoint", "application/vnd.ms-excel"};
+
+        Cursor cursor = mContentResolver.query(MediaStore.Files.getContentUri("external"),
+                projection, selection, selectionArgs, MediaStore.Files.FileColumns.DATE_MODIFIED + " desc");
+
+
+        while (cursor.moveToNext()) {
+
+            String filePath = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA));
+
+            File f = new File(filePath);
+            FileBean fileBean = new FileBean();
+            fileBean.setName(f.getName());
+            fileBean.setPath(filePath);
+            fileBean.setFileType(FileUtil.getFileType( f ));
+//            fileBean.setChildCount(0);int在类中默认初始化值为0
+//            fileBean.setSonFolderCount(0);
+//            fileBean.setSonFileCount(0);
+            fileBean.setSize( f.length() );
+            fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
+            fileBean.setHolderType( 0 );
+            texts.add(fileBean);
+            FileBean lineBean = new FileBean();
+            lineBean.setHolderType( 1 );
+            texts.add( lineBean );
+
+        }
+
+
+        cursor.close();
+        cursor = null;
+
+
+        return texts;
+
+    }
+
+    public static List<FileBean> getAllZip(Context mContext) {
+
+        ContentResolver mContentResolver =  mContext.getContentResolver();
+
+        List<FileBean> zips = new ArrayList<>();
+
+
+        String[] projection = new String[]{FileColumns.DATA};
+
+        String selection = MediaStore.Files.FileColumns.MIME_TYPE + "= ? ";
+
+        String[] selectionArgs = new String[]{"application/zip"};
+
+        Cursor cursor = mContentResolver.query(MediaStore.Files.getContentUri("external"), projection, selection, selectionArgs, MediaStore.Files.FileColumns.DATE_MODIFIED + " desc");
+
+
+        while (cursor.moveToNext()) {
+
+            String filePath = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA));
+
+
+
+            File f = new File(filePath);
+            FileBean fileBean = new FileBean();
+            fileBean.setName(f.getName());
+            fileBean.setPath(filePath);
+            fileBean.setFileType(FileType.zip);
+//            fileBean.setChildCount(0);int在类中默认初始化值为0
+//            fileBean.setSonFolderCount(0);
+//            fileBean.setSonFileCount(0);
+            fileBean.setSize( f.length() );
+            fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
+            fileBean.setHolderType( 0 );
+            zips.add(fileBean);
+            FileBean lineBean = new FileBean();
+            lineBean.setHolderType( 1 );
+            zips.add( lineBean );
+
+
+        }
+
+
+        return zips;
+
+    }
+
+    public static List<FileBean> getAllApk(Context mContext) {
+
+        ContentResolver mContentResolver =  mContext.getContentResolver();
+
+        List<FileBean> apks = new ArrayList<>();
+
+
+        String[] projection = new String[]{FileColumns.DATA};
+
+        String selection = MediaStore.Files.FileColumns.MIME_TYPE + "= ? ";
+
+        String[] selectionArgs = new String[]{"application/vnd.android.package-archive"};
+
+        Cursor cursor = mContentResolver.query(MediaStore.Files.getContentUri("external"),
+                projection, selection, selectionArgs, MediaStore.Files.FileColumns.DATE_MODIFIED + " desc");
+
+
+        while (cursor.moveToNext()) {
+
+            String filePath = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA));
+
+            File f = new File(filePath);
+            FileBean fileBean = new FileBean();
+            fileBean.setName(f.getName());
+            fileBean.setPath(filePath);
+            fileBean.setFileType(FileType.apk);
+//            fileBean.setChildCount(0);int在类中默认初始化值为0
+//            fileBean.setSonFolderCount(0);
+//            fileBean.setSonFileCount(0);
+            fileBean.setSize( f.length() );
+            fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
+            fileBean.setHolderType( 0 );
+            apks.add(fileBean);
+            FileBean lineBean = new FileBean();
+            lineBean.setHolderType( 1 );
+            apks.add( lineBean );
+
+
+        }
+
+
+        return apks;
+
+    }
+
     /*
-    传入Context和文件类型，获取文件
+    传入Context和文件类型，获取文件.https://www.jianshu.com/p/a6bdbefde77a
      */
-    public static void getSpecificTypeOfFile(Context context,String[] extension)
+    public static Cursor getSpecificTypeOfFile(Context context,String[] extension)
     {
         //从外存中获取
         Uri fileUri=Files.getContentUri("external");
@@ -51,25 +342,16 @@ public class FileUtil {
             }
             selection=selection+FileColumns.DATA+" LIKE '%"+extension[i]+"'";
         }
-        //按时间递增顺序对结果进行排序;待会从后往前移动游标就可实现时间递减
-        String sortOrder=FileColumns.DATE_MODIFIED;
+        //按时间递减顺序对结果进行排序;
+        String sortOrder=FileColumns.DATE_MODIFIED + " desc";
         //获取内容解析器对象
         ContentResolver resolver=context.getContentResolver();
         //获取游标
         Cursor cursor=resolver.query(fileUri, projection, selection, null, sortOrder);
-        if(cursor==null)
-            return;
-        //游标从最后开始往前递减，以此实现时间递减顺序（最近访问的文件，优先显示）
-        if(cursor.moveToLast())
-        {
-            do{
-                //输出文件的完整路径
-                String data=cursor.getString(0);
-                Log.d("tag", data);
-            }while(cursor.moveToPrevious());
-        }
-        cursor.close();
-
+        if(cursor == null)
+            return null;
+        else
+            return cursor;
     }
 
     /**

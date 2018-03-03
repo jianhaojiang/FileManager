@@ -8,7 +8,7 @@ public class FileBean {
 
     private String name;
     private String path;
-    private FileType fileType;
+    private FileType fileType = FileType.other;
     private int sonFileCount;
     private int sonFolderCount;
     private int childCount ;
