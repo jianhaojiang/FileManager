@@ -89,6 +89,10 @@ public class FileUtil {
 
     }
 
+    public static int getAllPhotoNumber(Context mContext){
+        return getAllPhoto(mContext).size()/2;//每一个数据都放了一个分割线数据，所以除以2
+    }
+
     public static List<FileBean> getAllMusic(Context mContext) {
 
         ContentResolver mContentResolver =  mContext.getContentResolver();
@@ -133,6 +137,10 @@ public class FileUtil {
 
     }
 
+    public static int getAllMusicNumber(Context mContext){
+        return getAllMusic(mContext).size()/2;
+    }
+
     public static List<FileBean> getAllVideo(Context mContext) {
 
         ContentResolver mContentResolver =  mContext.getContentResolver();
@@ -145,7 +153,6 @@ public class FileUtil {
 
         Cursor cursor = mContentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
                 projection, null, null, MediaStore.Video.VideoColumns.DATE_MODIFIED + " desc");
-
 
         while (cursor.moveToNext()) {
 
@@ -176,6 +183,10 @@ public class FileUtil {
 
         return videos;
 
+    }
+
+    public static int getAllVideoNumber(Context mContext){
+        return getAllVideo(mContext).size()/2;
     }
 
     public static List<FileBean> getAllText(Context mContext) {
@@ -230,6 +241,10 @@ public class FileUtil {
 
     }
 
+    public static int getAllTextNumber(Context mContext){
+        return getAllText(mContext).size()/2;
+    }
+
     public static List<FileBean> getAllZip(Context mContext) {
 
         ContentResolver mContentResolver =  mContext.getContentResolver();
@@ -276,6 +291,10 @@ public class FileUtil {
 
     }
 
+    public static int getAllZipNumber(Context mContext){
+        return getAllZip(mContext).size()/2;
+    }
+
     public static List<FileBean> getAllApk(Context mContext) {
 
         ContentResolver mContentResolver =  mContext.getContentResolver();
@@ -319,6 +338,10 @@ public class FileUtil {
 
         return apks;
 
+    }
+
+    public static int getAllApkNumber(Context mContext){
+        return getAllApk(mContext).size()/2;
     }
 
     /*

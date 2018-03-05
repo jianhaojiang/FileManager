@@ -78,9 +78,20 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         private RelativeLayout externalStorage;
         private TextView insideFileSize;
         private TextView externalFileSize;
+        private TextView classifyMusicNumber;
+        private TextView classifyPhotoNumber;
+        private TextView classifyTextNumber;
+        private TextView classifyVideoNumber;
+        private TextView classifyApkNumber;
+        private TextView classifyZipNumber;
         private String insideInfo;
         private String externalInfo;
-
+        private int musicTotal;
+        private int photoTotal;
+        private int textTotal;
+        private int videoTotal;
+        private int apkTotal;
+        private int zipTotal;
 
         @Override
         protected Object doInBackground(Object[] params) {
@@ -89,6 +100,15 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             }catch (Exception e){
                 e.printStackTrace();
             }
+
+            //得到各种类别文件数目
+            musicTotal = FileUtil.getAllMusicNumber(MainActivity.this);
+            photoTotal = FileUtil.getAllPhotoNumber(MainActivity.this);
+            textTotal  = FileUtil.getAllTextNumber(MainActivity.this);
+            videoTotal = FileUtil.getAllVideoNumber(MainActivity.this);
+            apkTotal   = FileUtil.getAllApkNumber(MainActivity.this);
+            zipTotal   = FileUtil.getAllZipNumber(MainActivity.this);
+
             rootPath = Environment.getExternalStorageDirectory().getAbsolutePath();//手机自带外部存储根目录
             totalPath = Environment.getDataDirectory().getPath();  //手机所有文件根目录
             SDPath = FileUtil.getExtendedMemoryPath(MainActivity.this);
@@ -113,9 +133,18 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             firstFragment = (localFileFragment)myAdapter.getItem(0);
             //RelativeLayout externalStorage = (RelativeLayout)findViewById(R.id.external_storage);//直接这样写也可以得到
             externalStorage = (RelativeLayout)firstFragment.getActivity().findViewById(R.id.external_storage);
-            insideFileSize = (TextView)firstFragment.getActivity().findViewById(R.id.insideFileSize);
+            insideFileSize   = (TextView)firstFragment.getActivity().findViewById(R.id.insideFileSize);
             externalFileSize = (TextView)firstFragment.getActivity().findViewById(R.id.externalFileSize);
-            //如果没有外置SD卡则不显示SD卡选项
+            classifyMusicNumber = (TextView) findViewById(R.id.classify_music_number);
+            classifyPhotoNumber = (TextView) findViewById(R.id.classify_image_number);
+            classifyTextNumber  = (TextView) findViewById(R.id.classify_txt_number);
+            classifyVideoNumber = (TextView) findViewById(R.id.classify_video_number);
+            classifyApkNumber   = (TextView) findViewById(R.id.classify_installpackage_number);
+            classifyZipNumber   = (TextView) findViewById(R.id.classify_zip_number);
+
+//            TextView textView = (TextView)findViewById(R.id.classify_image_number);
+//            String number =String.valueOf(photos.size()/2);
+//            textView.setText(number);
 
 //            if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 //                //检测手机自带的外部存储是否装载
@@ -124,6 +153,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 //                externalStorage.setVisibility(View.GONE);
 //            }
 
+            //如果没有外置SD卡则不显示SD卡选项
             if(SDPath == null){
                 externalStorage.setVisibility(View.GONE);
             }else {
@@ -131,6 +161,12 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             }
             insideFileSize.setText(insideInfo);
             externalFileSize.setText(externalInfo);
+            classifyMusicNumber.setText(String.valueOf(musicTotal));
+            classifyPhotoNumber.setText(String.valueOf(photoTotal));
+            classifyTextNumber.setText(String.valueOf(textTotal));
+            classifyVideoNumber.setText(String.valueOf(videoTotal));
+            classifyApkNumber.setText(String.valueOf(apkTotal));
+            classifyZipNumber.setText(String.valueOf(zipTotal));
         }
     }
 
@@ -167,7 +203,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         @Override
         public void onPageSelected(int arg0) {
             //viewPager的第arg0页处于当前屏幕的时候，将当前的arg0值赋值给记录Fragment的标签
-//            mCurrentFragment=arg0;
+            //mCurrentFragment=arg0;
+
             //将下面tab的RadioGroup的第arg0个radioButton设为选中状态
             ((RadioButton)rgTabButtons.getChildAt(arg0)).setChecked(true);
         }
