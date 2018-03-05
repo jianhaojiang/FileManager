@@ -62,6 +62,7 @@ public class LocalFileActivity extends AppCompatActivity {
 
     }
 
+
     public void initView(){
         // 无标题
         //supportRequestWindowFeature(Window.FEATURE_NO_TITLE);

@@ -39,9 +39,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     private ViewPager vp;
     private RadioGroup rgTabButtons;
-    private String SDPath;
-    private String rootPath;
-    private String totalPath;
     private int flagPath = -1;
     private int INSIDE_STORAGE = 0;
     private int EXTERNAL_STORAGE = 1;
@@ -69,110 +66,12 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         //设置RadioGroup的第一个RadioButton为初始状态为选中状态
         ((RadioButton)rgTabButtons.getChildAt(0)).setChecked(true);
         //不建议在onCreate刷新UI,而且这里刷新不了ViewPager里的Fragment子控件，只有在PagerView显示后才行即onCreate运行结束，于是在AsyncTask里面刷新
-        new RefreshTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , "") ;
     }
-
-    class RefreshTask extends AsyncTask {
-        private FragAdapter myAdapter;
-        private localFileFragment firstFragment;
-        private RelativeLayout externalStorage;
-        private TextView insideFileSize;
-        private TextView externalFileSize;
-        private TextView classifyMusicNumber;
-        private TextView classifyPhotoNumber;
-        private TextView classifyTextNumber;
-        private TextView classifyVideoNumber;
-        private TextView classifyApkNumber;
-        private TextView classifyZipNumber;
-        private String insideInfo;
-        private String externalInfo;
-        private int musicTotal;
-        private int photoTotal;
-        private int textTotal;
-        private int videoTotal;
-        private int apkTotal;
-        private int zipTotal;
-
-        @Override
-        protected Object doInBackground(Object[] params) {
-            try{
-                Thread.sleep(100);//等待onCreate结束再执行刷新界面的作用
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-
-            //得到各种类别文件数目
-            musicTotal = FileUtil.getAllMusicNumber(MainActivity.this);
-            photoTotal = FileUtil.getAllPhotoNumber(MainActivity.this);
-            textTotal  = FileUtil.getAllTextNumber(MainActivity.this);
-            videoTotal = FileUtil.getAllVideoNumber(MainActivity.this);
-            apkTotal   = FileUtil.getAllApkNumber(MainActivity.this);
-            zipTotal   = FileUtil.getAllZipNumber(MainActivity.this);
-
-            rootPath = Environment.getExternalStorageDirectory().getAbsolutePath();//手机自带外部存储根目录
-            totalPath = Environment.getDataDirectory().getPath();  //手机所有文件根目录
-            SDPath = FileUtil.getExtendedMemoryPath(MainActivity.this);
-            if(rootPath != null){
-                insideInfo = "总共：" + FileUtil.getAllSpace(MainActivity.this, totalPath) + "，可用："
-                        + FileUtil.getAvailSpace(MainActivity.this, totalPath) ;
-            }else {
-                insideInfo = "总共：0GB，可用：0GB";
-            }
-            if(SDPath != null){
-                externalInfo = "总共：" + FileUtil.getAllSpace(MainActivity.this, SDPath) + "，可用："
-                        + FileUtil.getAvailSpace(MainActivity.this, SDPath) ;
-            }else {
-                externalInfo = "总共：0GB，可用：0GB";
-            }
-            return SDPath;
-        }
-
-        @Override
-        protected void onPostExecute(Object o) {
-            myAdapter = (FragAdapter)vp.getAdapter();
-            firstFragment = (localFileFragment)myAdapter.getItem(0);
-            //RelativeLayout externalStorage = (RelativeLayout)findViewById(R.id.external_storage);//直接这样写也可以得到
-            externalStorage = (RelativeLayout)firstFragment.getActivity().findViewById(R.id.external_storage);
-            insideFileSize   = (TextView)firstFragment.getActivity().findViewById(R.id.insideFileSize);
-            externalFileSize = (TextView)firstFragment.getActivity().findViewById(R.id.externalFileSize);
-            classifyMusicNumber = (TextView) findViewById(R.id.classify_music_number);
-            classifyPhotoNumber = (TextView) findViewById(R.id.classify_image_number);
-            classifyTextNumber  = (TextView) findViewById(R.id.classify_txt_number);
-            classifyVideoNumber = (TextView) findViewById(R.id.classify_video_number);
-            classifyApkNumber   = (TextView) findViewById(R.id.classify_installpackage_number);
-            classifyZipNumber   = (TextView) findViewById(R.id.classify_zip_number);
-
-//            TextView textView = (TextView)findViewById(R.id.classify_image_number);
-//            String number =String.valueOf(photos.size()/2);
-//            textView.setText(number);
-
-//            if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-//                //检测手机自带的外部存储是否装载
-//                externalStorage.setVisibility(View.VISIBLE);
-//            }else {
-//                externalStorage.setVisibility(View.GONE);
-//            }
-
-            //如果没有外置SD卡则不显示SD卡选项
-            if(SDPath == null){
-                externalStorage.setVisibility(View.GONE);
-            }else {
-                externalStorage.setVisibility(View.VISIBLE);
-            }
-            insideFileSize.setText(insideInfo);
-            externalFileSize.setText(externalInfo);
-            classifyMusicNumber.setText(String.valueOf(musicTotal));
-            classifyPhotoNumber.setText(String.valueOf(photoTotal));
-            classifyTextNumber.setText(String.valueOf(textTotal));
-            classifyVideoNumber.setText(String.valueOf(videoTotal));
-            classifyApkNumber.setText(String.valueOf(apkTotal));
-            classifyZipNumber.setText(String.valueOf(zipTotal));
-        }
-    }
-
 
     @Override
     public void onClick(View v) {
+        String rootPath = Environment.getExternalStorageDirectory().getAbsolutePath();//手机自带外部存储根目录;
+        String SDPath = FileUtil.getExtendedMemoryPath(MainActivity.this);
         switch (v.getId()){
             case R.id.inside_storage:
                 flagPath = INSIDE_STORAGE;
@@ -183,15 +82,11 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 //                finish();
                 break;
             case R.id.external_storage:
-                if(SDPath == null){
-                    Toast.makeText(this, "没有检测到SD卡！", Toast.LENGTH_LONG).show();
-                }else {
-                    flagPath = EXTERNAL_STORAGE;
-                    Intent externalIntent = new Intent(MainActivity.this, LocalFileActivity.class);
-                    externalIntent.putExtra("Path", SDPath);
-                    externalIntent.putExtra("flagPath", flagPath);
-                    startActivity(externalIntent);
-                }
+                flagPath = EXTERNAL_STORAGE;
+                Intent externalIntent = new Intent(MainActivity.this, LocalFileActivity.class);
+                externalIntent.putExtra("Path", SDPath);
+                externalIntent.putExtra("flagPath", flagPath);
+                startActivity(externalIntent);
                 break;
             default:
 
