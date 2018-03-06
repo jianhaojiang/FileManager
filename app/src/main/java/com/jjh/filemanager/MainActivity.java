@@ -5,10 +5,12 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.view.View;
@@ -30,6 +32,8 @@ import java.util.Formatter;
 import java.util.List;
 
 import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.OnNeverAskAgain;
+import permissions.dispatcher.OnPermissionDenied;
 import permissions.dispatcher.OnShowRationale;
 import permissions.dispatcher.PermissionRequest;
 import permissions.dispatcher.RuntimePermissions;
@@ -48,8 +52,18 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //调用该语句申请权限，申请权限后执行getMulti方法
-        MainActivityPermissionsDispatcher.getMultiWithCheck(this);
+        //两个权限为同一个危险权限组，只需要判断其中一个权限，整组权限都可以通过
+        if(ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            //调用该语句申请权限
+            MainActivityPermissionsDispatcher.getMultiWithCheck(this);
+        }
+        else {
+            initView();
+        }
+}
+
+    public void initView(){
         //构造适配器
         List<Fragment> fragments = new ArrayList<Fragment>();
         fragments.add(new localFileFragment());
@@ -65,7 +79,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         rgTabButtons.setOnCheckedChangeListener(onCheckedChangeListener);
         //设置RadioGroup的第一个RadioButton为初始状态为选中状态
         ((RadioButton)rgTabButtons.getChildAt(0)).setChecked(true);
-        //不建议在onCreate刷新UI,而且这里刷新不了ViewPager里的Fragment子控件，只有在PagerView显示后才行即onCreate运行结束，于是在AsyncTask里面刷新
+        //不建议在onCreate刷新UI,而且这里刷新不了ViewPager里的Fragment子控件，
+        // 只有在PagerView显示后才行即onCreate运行结束，于是在AsyncTask里面刷新
     }
 
     @Override
@@ -135,10 +150,12 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 }
             };
 
-    //以下是使用PermissionsDispatcher申请权限写的方法
+    //以下是使用PermissionsDispatcher申请权限写的方法,当获取到权限时执行getMulti()方法
     @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE})
     void getMulti() {
+        initView();
+
     }
 
 
@@ -167,5 +184,16 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         }).show();
     }
 
+    @OnPermissionDenied({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
+    void StorageDenied() {
+        Toast.makeText(this, "已拒绝读写文件权限,将无法使用本应用", Toast.LENGTH_SHORT).show();
+        finish();
+    }
+
+    @OnNeverAskAgain({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
+    void StorageNeverAsk() {
+        Toast.makeText(this, "已拒绝读写文件权限,将无法使用本应用", Toast.LENGTH_SHORT).show();
+        finish();
+    }
 
 }
