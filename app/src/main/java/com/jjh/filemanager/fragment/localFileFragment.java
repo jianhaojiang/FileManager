@@ -40,11 +40,11 @@ public class localFileFragment extends Fragment {
 
         @Override
         protected Object doInBackground(Object[] params) {
-            try{
-                Thread.sleep(100);//等待onCreate结束再执行刷新界面的作用
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+//            try{
+//                Thread.sleep(100);//等待onCreate结束再执行刷新界面的作用
+//            }catch (Exception e){
+//                e.printStackTrace();
+//            }
 
             rootPath = Environment.getExternalStorageDirectory().getAbsolutePath();//手机自带外部存储根目录
             totalPath = Environment.getDataDirectory().getPath();  //手机所有文件根目录

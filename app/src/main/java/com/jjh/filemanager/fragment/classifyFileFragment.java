@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -40,14 +41,15 @@ public class classifyFileFragment extends Fragment {
         private int videoTotal;
         private int apkTotal;
         private int zipTotal;
+        private ProgressBar progressBar;
 
         @Override
         protected Object doInBackground(Object[] params) {
-            try{
-                Thread.sleep(100);//等待onCreate结束再执行刷新界面的作用
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+//            try{
+//                Thread.sleep(100);//等待onCreate结束再执行刷新界面的作用
+//            }catch (Exception e){
+//                e.printStackTrace();
+//            }
             //得到各种类别文件数目
             musicTotal = FileUtil.getAllMusicNumber(getContext());
             photoTotal = FileUtil.getAllPhotoNumber(getContext());
@@ -55,6 +57,7 @@ public class classifyFileFragment extends Fragment {
             videoTotal = FileUtil.getAllVideoNumber(getContext());
             apkTotal   = FileUtil.getAllApkNumber(getContext());
             zipTotal   = FileUtil.getAllZipNumber(getContext());
+
             return true;
         }
 
@@ -66,6 +69,8 @@ public class classifyFileFragment extends Fragment {
             classifyVideoNumber = (TextView) getActivity().findViewById(R.id.classify_video_number);
             classifyApkNumber   = (TextView) getActivity().findViewById(R.id.classify_installpackage_number);
             classifyZipNumber   = (TextView) getActivity().findViewById(R.id.classify_zip_number);
+            progressBar = (ProgressBar)getActivity().findViewById(R.id.progress_bar);
+
 
 //            TextView textView = (TextView)findViewById(R.id.classify_image_number);
 //            String number =String.valueOf(photos.size()/2);
@@ -76,7 +81,11 @@ public class classifyFileFragment extends Fragment {
             classifyVideoNumber.setText(String.valueOf(videoTotal));
             classifyApkNumber.setText(String.valueOf(apkTotal));
             classifyZipNumber.setText(String.valueOf(zipTotal));
+            if(progressBar.getVisibility() == View.VISIBLE){
+                progressBar.setVisibility(View.GONE);
+            }
         }
     }
+
 
 }

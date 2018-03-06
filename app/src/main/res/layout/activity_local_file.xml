@@ -4,7 +4,7 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#666666"
+    android:background="#ffffff"
     >
 
     <LinearLayout
@@ -34,8 +34,20 @@
 
     </LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_below="@id/fileState_rel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:background="#ffffff"
+        android:visibility="gone"
+        android:indeterminateDrawable="@drawable/progress_bar"
+        />
+
     <RelativeLayout
         android:layout_below="@id/fileState_rel"
+        android:id="@+id/body"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

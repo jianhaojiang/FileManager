@@ -15,6 +15,8 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.yanzhenjie.permission.AndPermission;
@@ -43,12 +45,14 @@ public class LocalFileActivity extends AppCompatActivity {
     private RecyclerView title_recycler_view ;
     private RecyclerView recyclerView;
     private FileAdapter fileAdapter;
+    private RelativeLayout bodyRelativeLayout;
     private List<FileBean> beanList = new ArrayList<>();
     private File rootFile ;
     private LinearLayout empty_rel ;
     private String Path ;
     private int pathFlag;
     private TitleAdapter titleAdapter ;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +73,9 @@ public class LocalFileActivity extends AppCompatActivity {
         //设置Title
         title_recycler_view = (RecyclerView) findViewById(R.id.title_recycler_view);
         //文件为空时显示该界面，不为空时隐藏
-        empty_rel = (LinearLayout) findViewById( R.id.empty_rel );
+        empty_rel = (LinearLayout)findViewById( R.id.empty_rel );
+        bodyRelativeLayout = (RelativeLayout)findViewById(R.id.body);
+        progressBar = (ProgressBar)findViewById(R.id.progress_bar);
         //表示水平布局，flase表示从左往右，LinearLayoutManager也可以将布局设置为网格布局
         title_recycler_view.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL , false ));
         titleAdapter = new TitleAdapter( LocalFileActivity.this , new ArrayList<TitlePath>() ) ;
@@ -168,6 +174,14 @@ public class LocalFileActivity extends AppCompatActivity {
     }
 
     public void getFile(String path ) {
+//        Log.d(TAG, "getFile: 66666666666666");
+        if(progressBar.getVisibility() == View.GONE){
+//            Log.d(TAG, "progressBar状态不可见: 66666666666666");
+            bodyRelativeLayout.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+//            empty_rel.setVisibility( View.GONE );
+//            recyclerView.setVisibility(View.GONE);
+        }
         rootFile = new File( path + File.separator  );//File.separator表示当前系统的路径分隔符
         new MyTask(rootFile).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , "") ;
     }
@@ -216,12 +230,19 @@ public class LocalFileActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Object o) {
+//            Log.d(TAG, "onPostExecute: 66666666666666");
+            //刷新数据并控制进度条显示
+            fileAdapter.refresh(beanList);
+            if(progressBar.getVisibility() == View.VISIBLE){
+//                Log.d(TAG, "progressBar状态显示: 66666666666666");
+                progressBar.setVisibility(View.GONE);
+                bodyRelativeLayout.setVisibility(View.VISIBLE);
+            }
             if ( beanList.size() > 0  ){
                 empty_rel.setVisibility( View.GONE );
             }else {
                 empty_rel.setVisibility( View.VISIBLE );
             }
-            fileAdapter.refresh(beanList);
         }
     }
 
