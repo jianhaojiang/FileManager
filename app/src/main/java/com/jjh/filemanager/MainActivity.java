@@ -46,6 +46,12 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private int flagPath = -1;
     private int INSIDE_STORAGE = 0;
     private int EXTERNAL_STORAGE = 1;
+    private final int TYPE_MUSIC = 1;
+    private final int TYPE_IMAGE = 2;
+    private final int TYPE_TXT   = 3;
+    private final int TYPE_VIDEO = 4;
+    private final int TYPE_APK   = 5;
+    private final int TYPE_ZIP   = 6;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +108,36 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 externalIntent.putExtra("Path", SDPath);
                 externalIntent.putExtra("flagPath", flagPath);
                 startActivity(externalIntent);
+                break;
+            case R.id.classify_music:
+                Intent musicsIntent = new Intent(MainActivity.this, ClassifyFileActivity.class);
+                musicsIntent.putExtra("Type", TYPE_MUSIC);
+                startActivity(musicsIntent);
+                break;
+            case R.id.classify_image:
+                Intent imagesIntent = new Intent(MainActivity.this, ClassifyFileActivity.class);
+                imagesIntent.putExtra("Type", TYPE_IMAGE);
+                startActivity(imagesIntent);
+                break;
+            case R.id.classify_txt:
+                Intent txtsIntent = new Intent(MainActivity.this, ClassifyFileActivity.class);
+                txtsIntent.putExtra("Type", TYPE_TXT);
+                startActivity(txtsIntent);
+                break;
+            case R.id.classify_video:
+                Intent videosIntent = new Intent(MainActivity.this, ClassifyFileActivity.class);
+                videosIntent.putExtra("Type", TYPE_VIDEO);
+                startActivity(videosIntent);
+                break;
+            case R.id.classify_installpackage:
+                Intent apksIntent = new Intent(MainActivity.this, ClassifyFileActivity.class);
+                apksIntent.putExtra("Type", TYPE_APK);
+                startActivity(apksIntent);
+                break;
+            case R.id.classify_zip:
+                Intent zipsIntent = new Intent(MainActivity.this, ClassifyFileActivity.class);
+                zipsIntent.putExtra("Type", TYPE_ZIP);
+                startActivity(zipsIntent);
                 break;
             default:
 

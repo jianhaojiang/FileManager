@@ -69,7 +69,7 @@ public class classifyFileFragment extends Fragment {
             classifyVideoNumber = (TextView) getActivity().findViewById(R.id.classify_video_number);
             classifyApkNumber   = (TextView) getActivity().findViewById(R.id.classify_installpackage_number);
             classifyZipNumber   = (TextView) getActivity().findViewById(R.id.classify_zip_number);
-            progressBar = (ProgressBar)getActivity().findViewById(R.id.progress_bar);
+            progressBar = (ProgressBar)getActivity().findViewById(R.id.classify_fragment_progress_bar);
 
 
 //            TextView textView = (TextView)findViewById(R.id.classify_image_number);

@@ -349,7 +349,7 @@
         </RelativeLayout>
     </GridLayout>
     <ProgressBar
-        android:id="@+id/progress_bar"
+        android:id="@+id/classify_fragment_progress_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:indeterminateDrawable="@drawable/fragment_progress_bar"

@@ -34,14 +34,18 @@ import android.util.Log;
  */
 
 public class FileUtil {
+    private static List<FileBean> photos = new ArrayList<>();
+    private static List<FileBean> musics = new ArrayList<>();
+    private static List<FileBean> videos = new ArrayList<>();
+    private static List<FileBean> texts  = new ArrayList<>();
+    private static List<FileBean> zips   = new ArrayList<>();
+    private static List<FileBean> apks   = new ArrayList<>();
 
 
-    public static List<FileBean> getAllPhoto(Context mContext) {
+    private static List<FileBean> getAllPhoto(Context mContext) {
 
         ContentResolver mContentResolver =  mContext.getContentResolver();
-
-        List<FileBean> photos = new ArrayList<>();
-
+        photos.clear();
         String[] projection = new String[]{
                 MediaStore.Images.ImageColumns.DATA,};
         //MediaStore.Images.ImageColumns._ID, MediaStore.Images.ImageColumns.DISPLAY_NAME
@@ -93,11 +97,10 @@ public class FileUtil {
         return getAllPhoto(mContext).size()/2;//每一个数据都放了一个分割线数据，所以除以2
     }
 
-    public static List<FileBean> getAllMusic(Context mContext) {
+    private static List<FileBean> getAllMusic(Context mContext) {
 
         ContentResolver mContentResolver =  mContext.getContentResolver();
-        List<FileBean> musics = new ArrayList<>();
-
+        musics.clear();
 
         String[] projection = new String[]{MediaStore.Audio.AudioColumns.DATA};
 
@@ -141,12 +144,10 @@ public class FileUtil {
         return getAllMusic(mContext).size()/2;
     }
 
-    public static List<FileBean> getAllVideo(Context mContext) {
+    private static List<FileBean> getAllVideo(Context mContext) {
 
         ContentResolver mContentResolver =  mContext.getContentResolver();
-
-        List<FileBean> videos = new ArrayList<>();
-
+        videos.clear();
 
         String[] projection = new String[]{MediaStore.Video.VideoColumns.DATA};
 
@@ -189,11 +190,10 @@ public class FileUtil {
         return getAllVideo(mContext).size()/2;
     }
 
-    public static List<FileBean> getAllText(Context mContext) {
+    private static List<FileBean> getAllText(Context mContext) {
 
         ContentResolver mContentResolver =  mContext.getContentResolver();
-
-        List<FileBean> texts = new ArrayList<>();
+        texts.clear();
 
         String[] projection = new String[]{FileColumns.DATA};
 
@@ -245,12 +245,10 @@ public class FileUtil {
         return getAllText(mContext).size()/2;
     }
 
-    public static List<FileBean> getAllZip(Context mContext) {
+    private static List<FileBean> getAllZip(Context mContext) {
 
         ContentResolver mContentResolver =  mContext.getContentResolver();
-
-        List<FileBean> zips = new ArrayList<>();
-
+        zips.clear();
 
         String[] projection = new String[]{FileColumns.DATA};
 
@@ -264,8 +262,6 @@ public class FileUtil {
         while (cursor.moveToNext()) {
 
             String filePath = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA));
-
-
 
             File f = new File(filePath);
             FileBean fileBean = new FileBean();
@@ -284,6 +280,7 @@ public class FileUtil {
             zips.add( lineBean );
 
 
+
         }
 
 
@@ -295,12 +292,10 @@ public class FileUtil {
         return getAllZip(mContext).size()/2;
     }
 
-    public static List<FileBean> getAllApk(Context mContext) {
+    private static List<FileBean> getAllApk(Context mContext) {
 
         ContentResolver mContentResolver =  mContext.getContentResolver();
-
-        List<FileBean> apks = new ArrayList<>();
-
+        apks.clear();
 
         String[] projection = new String[]{FileColumns.DATA};
 
@@ -331,7 +326,6 @@ public class FileUtil {
             FileBean lineBean = new FileBean();
             lineBean.setHolderType( 1 );
             apks.add( lineBean );
-
 
         }
 
@@ -814,4 +808,29 @@ public class FileUtil {
         share.setType("*/*");//此处可发送多种文件
         context.startActivity(Intent.createChooser(share, "发送"));
     }
+
+    public static List<FileBean> getPhotos() {
+        return photos;
+    }
+
+    public static List<FileBean> getMusics() {
+        return musics;
+    }
+
+    public static List<FileBean> getVideos() {
+        return videos;
+    }
+
+    public static List<FileBean> getTexts() {
+        return texts;
+    }
+
+    public static List<FileBean> getZips() {
+        return zips;
+    }
+
+    public static List<FileBean> getApks() {
+        return apks;
+    }
+
 }

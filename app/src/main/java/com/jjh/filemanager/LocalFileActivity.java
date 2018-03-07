@@ -1,12 +1,7 @@
 package com.jjh.filemanager;
-import android.Manifest;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.StatFs;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,9 +13,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.PermissionListener;
 import com.jjh.filemanager.adapter.FileHolder;
 import com.jjh.filemanager.adapter.FileAdapter;
 import com.jjh.filemanager.adapter.TitleAdapter;
@@ -68,7 +60,7 @@ public class LocalFileActivity extends AppCompatActivity {
 
 
     public void initView(){
-        // 无标题
+        // 无标题,在activity继承AppCompatActivity的情况下好像无效，会闪退
         //supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         //设置Title
         title_recycler_view = (RecyclerView) findViewById(R.id.title_recycler_view);
@@ -176,7 +168,7 @@ public class LocalFileActivity extends AppCompatActivity {
     public void getFile(String path ) {
 //        Log.d(TAG, "getFile: 66666666666666");
         if(progressBar.getVisibility() == View.GONE){
-//            Log.d(TAG, "progressBar状态不可见: 66666666666666");
+//            Log.d("aaaaaaa", "progressBar状态不可见: 66666666666666");
             bodyRelativeLayout.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
 //            empty_rel.setVisibility( View.GONE );
