@@ -73,6 +73,10 @@ public class FileHolder extends RecyclerViewHolder<FileHolder> {
             Glide.with(fileHolder.itemView.getContext()).load(new File(fileBean.getPath())).into(fileHolder.fileIcon);
         } else if (fileType == FileType.apk) {
             fileHolder.fileIcon.setImageResource(R.mipmap.file_icon_apk);
+        } else if (fileType == FileType.doc) {
+            fileHolder.fileIcon.setImageResource(R.mipmap.file_icon_doc);
+        } else if (fileType == FileType.pdf) {
+            fileHolder.fileIcon.setImageResource(R.mipmap.file_icon_pdf);
         } else {
             fileHolder.fileIcon.setImageResource(R.mipmap.file_icon_other);
         }

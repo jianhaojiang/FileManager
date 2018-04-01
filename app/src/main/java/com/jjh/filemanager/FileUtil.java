@@ -535,7 +535,7 @@ public class FileUtil {
         if ( fileName.endsWith(".pdf") ) {
             return FileType.pdf ;
         }
-        if ( fileName.endsWith(".doc") ) {
+        if ( fileName.endsWith(".doc") || fileName.endsWith(".docx") ) {
             return FileType.doc ;
         }
 
@@ -545,7 +545,7 @@ public class FileUtil {
 
 
     private static boolean isLetter(String str) {
-        String regex = "^[a-zA-Z]+$";//其他需要，直接修改正则表达式就好
+        String regex = "^[a-zA-Z]+$";//其他需要，直接修改正则表达式就好.判断为单词
 //        String regex = "^[a-z0-9A-Z\u4e00-\u9fa5]+$"
         return str.matches(regex);
     }
@@ -591,6 +591,157 @@ public class FileUtil {
             }else {
                 //再排序同类型的文件或文件夹
                 return compareAB(file1.getName(), file2.getName()) ;
+            }
+        }
+    } ;
+
+    //按名称升序
+    public static Comparator comparatorNameAsc = new Comparator<FileBean>() {
+        @Override
+        public int compare(FileBean fileBean1 , FileBean fileBean2 ) {
+            if ( fileBean1.getFileType()==FileType.directory && fileBean2.getFileType()!=FileType.directory ){
+                return -1 ;
+            }else if (fileBean1.getFileType()!=FileType.directory && fileBean2.getFileType()==FileType.directory ) {
+                return 1;
+            }else {
+                return fileBean1.getName().compareTo(fileBean2.getName());
+            }
+        }
+    } ;
+
+    //按名称降序
+    public static Comparator comparatorNameDesc = new Comparator<FileBean>() {
+        @Override
+        public int compare(FileBean fileBean1 , FileBean fileBean2 ) {
+            if ( fileBean1.getFileType()==FileType.directory && fileBean2.getFileType()!=FileType.directory ){
+                return -1 ;
+            }else if (fileBean1.getFileType()!=FileType.directory && fileBean2.getFileType()==FileType.directory ) {
+                return 1;
+            }else {
+                return fileBean2.getName().compareTo(fileBean1.getName());
+            }
+        }
+    } ;
+
+    //按大小升序
+    public static Comparator comparatorSizeAsc = new Comparator<FileBean>() {
+        @Override
+        public int compare(FileBean fileBean1 , FileBean fileBean2 ) {
+            if ( fileBean1.getFileType()==FileType.directory && fileBean2.getFileType()!=FileType.directory ){
+                return -1 ;
+            }else if (fileBean1.getFileType()!=FileType.directory && fileBean2.getFileType()==FileType.directory ) {
+                return 1;
+            }else {
+                if (fileBean1.getSize() - fileBean2.getSize() < 0) {
+                    return -1;// 小文件在前
+                } else if (fileBean1.getSize() - fileBean2.getSize() > 0) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        }
+    } ;
+
+    //按大小降序
+    public static Comparator comparatorSizeDesc = new Comparator<FileBean>() {
+        @Override
+        public int compare(FileBean fileBean1 , FileBean fileBean2 ) {
+            if ( fileBean1.getFileType()==FileType.directory && fileBean2.getFileType()!=FileType.directory ){
+                return -1 ;
+            }else if (fileBean1.getFileType()!=FileType.directory && fileBean2.getFileType()==FileType.directory ) {
+                return 1;
+            }else {
+                if (fileBean1.getSize() - fileBean2.getSize() > 0) {
+                    return -1;// 大文件在前
+                } else if (fileBean1.getSize() - fileBean2.getSize() < 0) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        }
+    } ;
+
+    //按类型升序
+    public static Comparator comparatorTypeAsc = new Comparator<FileBean>() {
+        @Override
+        public int compare(FileBean fileBean1 , FileBean fileBean2 ) {
+            if ( fileBean1.getFileType()==FileType.directory && fileBean2.getFileType()!=FileType.directory ){
+                return -1 ;
+            }else if (fileBean1.getFileType()!=FileType.directory && fileBean2.getFileType()==FileType.directory ) {
+                return 1;
+            }else if (fileBean1.getFileType() == fileBean2.getFileType()) {
+                return 0;
+            } else {
+                return fileBean1.getFileType().compareTo(fileBean2.getFileType());
+            }
+        }
+    } ;
+
+    //按类型降序
+    public static Comparator comparatorTypeDesc = new Comparator<FileBean>() {
+        @Override
+        public int compare(FileBean fileBean1 , FileBean fileBean2 ) {
+            if ( fileBean1.getFileType()==FileType.directory && fileBean2.getFileType()!=FileType.directory ){
+                return -1 ;
+            }else if (fileBean1.getFileType()!=FileType.directory && fileBean2.getFileType()==FileType.directory ) {
+                return 1;
+            }else if (fileBean1.getFileType() == fileBean2.getFileType()) {
+                return 0;
+            } else {
+                return fileBean1.getFileType().compareTo(fileBean2.getFileType());
+            }
+        }
+    } ;
+
+    //按时间升序
+    public static Comparator comparatorDateAsc = new Comparator<FileBean>() {
+        @Override
+        public int compare(FileBean fileBean1 , FileBean fileBean2 ) {
+            if ( fileBean1.getFileType()==FileType.directory && fileBean2.getFileType()!=FileType.directory ){
+                return -1 ;
+            }else if (fileBean1.getFileType()!=FileType.directory && fileBean2.getFileType()==FileType.directory ) {
+                return 1;
+            }else {
+                File file1 = new File(fileBean1.getPath());
+                File file2 = new File(fileBean2.getPath());
+                if (file1.lastModified() < file2.lastModified()) {
+                    return -1;// 最后修改的文件在后
+                } else if (file1.lastModified() > file2.lastModified()) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        }
+    } ;
+
+    //按时间降序
+    public static Comparator comparatorDateDesc = new Comparator<FileBean>() {
+        @Override
+        public int compare(FileBean fileBean1 , FileBean fileBean2 ) {
+            if ( fileBean1.getFileType()==FileType.directory && fileBean2.getFileType()!=FileType.directory ){
+                return -1 ;
+            }else if (fileBean1.getFileType()!=FileType.directory && fileBean2.getFileType()==FileType.directory ) {
+                return 1;
+            }else {
+//                try {
+                    File file1 = new File(fileBean1.getPath());
+                    File file2 = new File(fileBean2.getPath());
+                    if (file1.lastModified() > file2.lastModified()) {
+                        return -1;// 最后修改的文件在前
+                    } else if (file1.lastModified() < file2.lastModified()) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                    return 0;
+//                } finally {
+//
+//                }
             }
         }
     } ;

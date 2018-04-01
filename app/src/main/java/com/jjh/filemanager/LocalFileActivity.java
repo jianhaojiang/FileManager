@@ -1,7 +1,9 @@
 package com.jjh.filemanager;
 
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,6 +25,8 @@ import com.jjh.filemanager.bean.FileType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import permissions.dispatcher.NeedsPermission;
@@ -39,17 +43,24 @@ public class LocalFileActivity extends AppCompatActivity {
     private FileAdapter fileAdapter;
     private RelativeLayout bodyRelativeLayout;
     private List<FileBean> beanList = new ArrayList<>();
+    private List<FileBean> localBeanList = new ArrayList<>();
     private File rootFile ;
     private LinearLayout empty_rel ;
     private String Path ;
     private int pathFlag;
     private TitleAdapter titleAdapter ;
     private ProgressBar progressBar;
+    private int sortOrder;
+//    int order = 0;
+    private HashMap pathMap = new HashMap();
+    private HashMap localMap = new HashMap();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_local_file);
+//        LinearLayout l = (LinearLayout)findViewById(R.id.sss);
+//        l.setVisibility(View.GONE);
 
         //初始化页面和监听
         initView();
@@ -58,6 +69,195 @@ public class LocalFileActivity extends AppCompatActivity {
 
     }
 
+    public void onClickMenu(View v){
+        switch (v.getId()){
+            case R.id.activity_sort:
+                showOrderDialog();
+                break;
+            case R.id.activity_search:
+                break;
+            case R.id.activity_edit:
+                break;
+            default:
+        }
+
+    }
+
+
+    // 排序选择
+    private void showOrderDialog(){
+
+        final String[] items = { "名称","大小","类型","时间"};
+        sortOrder = -1;
+        AlertDialog.Builder singleChoiceDialog =
+                new AlertDialog.Builder(LocalFileActivity.this);
+        singleChoiceDialog.setTitle("选择排序方法");
+        // 第二个参数是默认选项，此处设置为0
+        singleChoiceDialog.setSingleChoiceItems(items, -1,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                sortOrder = 0;
+//                                Toast.makeText(LocalFileActivity.this, "你选择了00", Toast.LENGTH_SHORT).show();
+                                break;
+                            case 1:sortOrder = 1;break;
+                            case 2:sortOrder = 2;break;
+                            case 3:sortOrder = 3;break;
+                            default: break;
+                        }
+                    }
+                });
+        singleChoiceDialog.setPositiveButton("降序",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        List<FileBean> localList = new ArrayList<>();
+//                        Toast.makeText(LocalFileActivity.this, "你选择了", Toast.LENGTH_SHORT).show();
+                        switch (sortOrder) {
+                            case -1:
+                                break;
+                            case 0:
+//                                Toast.makeText(LocalFileActivity.this, "你选择了0jj", Toast.LENGTH_SHORT).show();
+                                Collections.sort( localBeanList , FileUtil.comparatorNameDesc );
+                                if(!localBeanList.isEmpty()){
+                                    Iterator it = localBeanList.iterator();
+                                    while(it.hasNext()) {
+                                        localList.add((FileBean) it.next());
+                                        FileBean lineBean = new FileBean();
+                                        lineBean.setHolderType( 1 );
+                                        localList.add( lineBean );
+                                    }
+                                }
+                                beanList = localList;
+                                break;
+                            case 1:
+                                Collections.sort( localBeanList , FileUtil.comparatorSizeDesc );
+                                if(!localBeanList.isEmpty()){
+                                    Iterator it = localBeanList.iterator();
+                                    while(it.hasNext()) {
+                                        localList.add((FileBean) it.next());
+                                        FileBean lineBean = new FileBean();
+                                        lineBean.setHolderType( 1 );
+                                        localList.add( lineBean );
+                                    }
+                                }
+                                beanList = localList;
+                                break;
+                            case 2:
+                                Collections.sort( localBeanList , FileUtil.comparatorTypeDesc );
+                                if(!localBeanList.isEmpty()){
+                                    Iterator it = localBeanList.iterator();
+                                    while(it.hasNext()) {
+                                        localList.add((FileBean) it.next());
+                                        FileBean lineBean = new FileBean();
+                                        lineBean.setHolderType( 1 );
+                                        localList.add( lineBean );
+                                    }
+                                }
+                                beanList = localList;
+                                break;
+                            case 3:
+                                Collections.sort( localBeanList , FileUtil.comparatorDateDesc );
+                                if(!localBeanList.isEmpty()){
+                                    Iterator it = localBeanList.iterator();
+                                    while(it.hasNext()) {
+                                        localList.add((FileBean) it.next());
+                                        FileBean lineBean = new FileBean();
+                                        lineBean.setHolderType( 1 );
+                                        localList.add( lineBean );
+                                    }
+                                }
+                                beanList = localList;
+                                break;
+                            default: break;
+                        }
+                        sortOrder = -1;
+                        fileAdapter.refresh(beanList);//有可能涉及ui刷新
+//                        runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                fileAdapter.refresh(beanList);//有可能涉及ui刷新
+//                            }
+//                        });
+                    }
+                });
+        singleChoiceDialog.setNegativeButton("升序",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        List<FileBean> localList = new ArrayList<>();
+                        switch (sortOrder) {
+                             case -1:
+                                 break;
+                             case 0:
+                                 Collections.sort( localBeanList , FileUtil.comparatorNameAsc );
+                                 if(!localBeanList.isEmpty()){
+                                     Iterator it = localBeanList.iterator();
+                                     while(it.hasNext()) {
+                                         localList.add((FileBean) it.next());
+                                         FileBean lineBean = new FileBean();
+                                         lineBean.setHolderType( 1 );
+                                         localList.add( lineBean );
+                                     }
+                                 }
+                                 beanList = localList;
+                                 break;
+                             case 1:
+                                 Collections.sort( localBeanList , FileUtil.comparatorSizeAsc );
+                                 if(!localBeanList.isEmpty()){
+                                     Iterator it = localBeanList.iterator();
+                                     while(it.hasNext()) {
+                                         localList.add((FileBean) it.next());
+                                         FileBean lineBean = new FileBean();
+                                         lineBean.setHolderType( 1 );
+                                         localList.add( lineBean );
+                                     }
+                                 }
+                                 beanList = localList;
+                                 break;
+                             case 2:
+                                 Collections.sort( localBeanList , FileUtil.comparatorTypeAsc );
+                                 if(!localBeanList.isEmpty()){
+                                     Iterator it = localBeanList.iterator();
+                                     while(it.hasNext()) {
+                                         localList.add((FileBean) it.next());
+                                         FileBean lineBean = new FileBean();
+                                         lineBean.setHolderType( 1 );
+                                         localList.add( lineBean );
+                                     }
+                                 }
+                                 beanList = localList;
+                                 break;
+                             case 3:
+                                 Collections.sort( localBeanList , FileUtil.comparatorDateAsc );
+                                 if(!localBeanList.isEmpty()){
+                                     Iterator it = localBeanList.iterator();
+                                     while(it.hasNext()) {
+                                         localList.add((FileBean) it.next());
+                                         FileBean lineBean = new FileBean();
+                                         lineBean.setHolderType( 1 );
+                                         localList.add( lineBean );
+                                     }
+                                 }
+                                 beanList = localList;
+                                 break;
+                             default: break;
+                         }
+//                        Toast.makeText(LocalFileActivity.this, "你选择了升序"+(sortOrder+1), Toast.LENGTH_SHORT).show();
+                        sortOrder = -1;
+                        fileAdapter.refresh(beanList);//有可能涉及ui刷新
+//                        runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                fileAdapter.refresh(beanList);//有可能涉及ui刷新
+//                            }
+//                        });
+                    }
+                });
+        singleChoiceDialog.show();
+    }
 
     public void initView(){
         // 无标题,在activity继承AppCompatActivity的情况下好像无效，会闪退
@@ -85,7 +285,19 @@ public class LocalFileActivity extends AppCompatActivity {
                     FileBean file = beanList.get(position);
                     FileType fileType = file.getFileType() ;
                     if ( fileType == FileType.directory) {
-                        getFile(file.getPath());
+                        //111666
+                        if(pathMap.containsKey(file.getPath())){
+                            beanList = (List<FileBean>) pathMap.get(file.getPath());
+                            localBeanList = (List<FileBean>) localMap.get(file.getPath());
+                            fileAdapter.refresh(beanList);
+                            if ( beanList.size() > 0  ){
+                                empty_rel.setVisibility( View.GONE );
+                            }else {
+                                empty_rel.setVisibility( View.VISIBLE );
+                            }
+                        }else{
+                            getFile(file.getPath());
+                        }
 
                         refreshTitleState( file.getName() , file.getPath() );
                     }else if ( fileType == FileType.apk ){
@@ -128,8 +340,19 @@ public class LocalFileActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view, RecyclerView.ViewHolder viewHolder, int position) {
                 TitlePath titlePath = (TitlePath) titleAdapter.getItem( position );
-                getFile( titlePath.getPath() );
-
+                //111666
+                if(pathMap.containsKey(titlePath.getPath())){
+                    beanList = (List<FileBean>) pathMap.get(titlePath.getPath());
+                    localBeanList = (List<FileBean>) localMap.get(titlePath.getPath());
+                    fileAdapter.refresh(beanList);
+                    if ( beanList.size() > 0  ){
+                        empty_rel.setVisibility( View.GONE );
+                    }else {
+                        empty_rel.setVisibility( View.VISIBLE );
+                    }
+                }else{
+                    getFile(titlePath.getPath());
+                }
                 int count = titleAdapter.getItemCount() ;
                 int removeCount = count - position - 1 ;
                 for ( int i = 0 ; i < removeCount ; i++ ){
@@ -162,7 +385,19 @@ public class LocalFileActivity extends AppCompatActivity {
                 break;
             default:
         }
-        getFile(Path);
+        //111666
+        if(pathMap.containsKey(Path)){
+            beanList = (List<FileBean>) pathMap.get(Path);
+            localBeanList = (List<FileBean>) localMap.get(Path);
+            fileAdapter.refresh(beanList);
+            if ( beanList.size() > 0  ){
+                empty_rel.setVisibility( View.GONE );
+            }else {
+                empty_rel.setVisibility( View.VISIBLE );
+            }
+        }else{
+            getFile(Path);
+        }
     }
 
     public void getFile(String path ) {
@@ -208,15 +443,27 @@ public class LocalFileActivity extends AppCompatActivity {
                         fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
                         fileBean.setHolderType( 0 );
                         fileBeenList.add(fileBean);
-                        FileBean lineBean = new FileBean();
-                        lineBean.setHolderType( 1 );
-                        fileBeenList.add( lineBean );
+//                        FileBean lineBean = new FileBean();
+//                        lineBean.setHolderType( 1 );
+//                        fileBeenList.add( lineBean );
 
                     }
                 }
             }
-
-            beanList = fileBeenList;
+            localBeanList = fileBeenList;
+            List<FileBean> localList = new ArrayList<>();
+            if(!fileBeenList.isEmpty()){
+                Iterator it = fileBeenList.iterator();
+                while(it.hasNext()) {
+                    localList.add((FileBean) it.next());
+                    FileBean lineBean = new FileBean();
+                    lineBean.setHolderType( 1 );
+                    localList.add( lineBean );
+                }
+            }
+            beanList = localList;
+            pathMap.put(file.getPath(),beanList);
+            localMap.put(file.getPath(),localBeanList);
             return fileBeenList;
         }
 
@@ -262,7 +509,20 @@ public class LocalFileActivity extends AppCompatActivity {
                 finish();
             }else {
                 titleAdapter.removeItem( titlePathList.size() - 1 );
-                getFile( titlePathList.get(titlePathList.size() - 1 ).getPath() );
+                String upTitlePath =  titlePathList.get(titlePathList.size() - 1 ).getPath();
+                //111666
+                if(pathMap.containsKey(upTitlePath)){
+                    beanList = (List<FileBean>) pathMap.get(upTitlePath);
+                    localBeanList = (List<FileBean>) localMap.get(upTitlePath);
+                    fileAdapter.refresh(beanList);
+                    if ( beanList.size() > 0  ){
+                        empty_rel.setVisibility( View.GONE );
+                    }else {
+                        empty_rel.setVisibility( View.VISIBLE );
+                    }
+                }else{
+                    getFile(upTitlePath);
+                }
             }
             return true;
         }

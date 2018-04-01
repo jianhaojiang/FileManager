@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="#f4f3f3"
+    >
+
+    <LinearLayout
+        android:id="@+id/activity_edit"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:background="@drawable/item_selector"
+        android:onClick="onClickMenu">
+
+        <ImageView
+            android:id="@+id/activity_edit_image"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/activity_edit_image" />
+
+        <TextView
+            android:id="@+id/activity_edit_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="5dp"
+            android:text="编辑"
+            android:textColor="#616060"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/activity_search"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:background="@drawable/item_selector"
+        android:onClick="onClickMenu"
+        >
+
+        <ImageView
+            android:id="@+id/activity_search_image"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/activity_search_image" />
+
+        <TextView
+            android:id="@+id/activity_search_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="5dp"
+            android:text="搜索"
+            android:textColor="#616060"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/activity_sort"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:background="@drawable/item_selector"
+        android:onClick="onClickMenu"
+        >
+
+        <ImageView
+            android:id="@+id/activity_sort_image"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/activity_sort_image" />
+
+        <TextView
+            android:id="@+id/activity_sort_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="5dp"
+            android:text="排序"
+            android:textColor="#616060"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</LinearLayout>

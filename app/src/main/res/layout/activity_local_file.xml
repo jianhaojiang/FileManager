@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff"
+    android:background="#f4f3f3"
     >
 
     <LinearLayout
@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#ffffff"
+        android:background="#f4f3f3"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         >
@@ -20,7 +20,7 @@
             android:id="@+id/title_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#ffffff"
+            android:background="#f4f3f3"
             >
         </android.support.v7.widget.RecyclerView>
 
@@ -39,16 +39,29 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="100dp"
-        android:background="#ffffff"
+        android:background="#f4f3f3"
         android:visibility="gone"
         android:indeterminateDrawable="@drawable/progress_bar"
         />
 
-    <RelativeLayout
-        android:layout_below="@id/fileState_rel"
-        android:id="@+id/body"
+    <LinearLayout
+        android:id="@+id/activity_bottom"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        >
+
+        <include layout="@layout/activity_bottom1"
+            android:id="@+id/sss"></include>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/body"
+        android:layout_below="@id/fileState_rel"
+        android:layout_above="@id/activity_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view"
@@ -87,6 +100,7 @@
         </LinearLayout>
 
     </RelativeLayout>
+
 
 
 </RelativeLayout>
