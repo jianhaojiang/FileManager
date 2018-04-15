@@ -41,7 +41,6 @@ public class FileUtil {
     private static List<FileBean> zips   = new ArrayList<>();
     private static List<FileBean> apks   = new ArrayList<>();
 
-
     private static List<FileBean> getAllPhoto(Context mContext) {
 
         ContentResolver mContentResolver =  mContext.getContentResolver();
@@ -68,6 +67,7 @@ public class FileUtil {
             String filePath = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA));
 
             File f = new File(filePath);
+            if (f.isHidden()) continue;
             FileBean fileBean = new FileBean();
             fileBean.setName(f.getName());
             fileBean.setPath(filePath);
@@ -79,22 +79,19 @@ public class FileUtil {
             fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
             fileBean.setHolderType( 0 );
             photos.add(fileBean);
-            FileBean lineBean = new FileBean();
-            lineBean.setHolderType( 1 );
-            photos.add( lineBean );
 
 //            Log.e("phone_photo",  " -- " + filePath);
         }
         cursor.close();
 
-        cursor = null;
+//        cursor = null;
 
         return photos;
 
     }
 
     public static int getAllPhotoNumber(Context mContext){
-        return getAllPhoto(mContext).size()/2;//每一个数据都放了一个分割线数据，所以除以2
+        return getAllPhoto(mContext).size();
     }
 
     private static List<FileBean> getAllMusic(Context mContext) {
@@ -115,6 +112,7 @@ public class FileUtil {
             String filePath = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DATA));
 
             File f = new File(filePath);
+            if (f.isHidden()) continue;
             FileBean fileBean = new FileBean();
             fileBean.setName(f.getName());
             fileBean.setPath(filePath);
@@ -126,22 +124,18 @@ public class FileUtil {
             fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
             fileBean.setHolderType( 0 );
             musics.add(fileBean);
-            FileBean lineBean = new FileBean();
-            lineBean.setHolderType( 1 );
-            musics.add( lineBean );
+
 
         }
 
         cursor.close();
-
-        cursor = null;
 
         return musics;
 
     }
 
     public static int getAllMusicNumber(Context mContext){
-        return getAllMusic(mContext).size()/2;
+        return getAllMusic(mContext).size();
     }
 
     private static List<FileBean> getAllVideo(Context mContext) {
@@ -161,6 +155,7 @@ public class FileUtil {
 
 
             File f = new File(filePath);
+            if (f.isHidden()) continue;
             FileBean fileBean = new FileBean();
             fileBean.setName(f.getName());
             fileBean.setPath(filePath);
@@ -172,10 +167,6 @@ public class FileUtil {
             fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
             fileBean.setHolderType( 0 );
             videos.add(fileBean);
-            FileBean lineBean = new FileBean();
-            lineBean.setHolderType( 1 );
-            videos.add( lineBean );
-
 
         }
 
@@ -187,7 +178,7 @@ public class FileUtil {
     }
 
     public static int getAllVideoNumber(Context mContext){
-        return getAllVideo(mContext).size()/2;
+        return getAllVideo(mContext).size();
     }
 
     private static List<FileBean> getAllText(Context mContext) {
@@ -215,6 +206,7 @@ public class FileUtil {
             String filePath = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA));
 
             File f = new File(filePath);
+            if (f.isHidden()) continue;
             FileBean fileBean = new FileBean();
             fileBean.setName(f.getName());
             fileBean.setPath(filePath);
@@ -226,9 +218,6 @@ public class FileUtil {
             fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
             fileBean.setHolderType( 0 );
             texts.add(fileBean);
-            FileBean lineBean = new FileBean();
-            lineBean.setHolderType( 1 );
-            texts.add( lineBean );
 
         }
 
@@ -242,7 +231,7 @@ public class FileUtil {
     }
 
     public static int getAllTextNumber(Context mContext){
-        return getAllText(mContext).size()/2;
+        return getAllText(mContext).size();
     }
 
     private static List<FileBean> getAllZip(Context mContext) {
@@ -264,6 +253,7 @@ public class FileUtil {
             String filePath = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA));
 
             File f = new File(filePath);
+            if (f.isHidden()) continue;
             FileBean fileBean = new FileBean();
             fileBean.setName(f.getName());
             fileBean.setPath(filePath);
@@ -275,10 +265,6 @@ public class FileUtil {
             fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
             fileBean.setHolderType( 0 );
             zips.add(fileBean);
-            FileBean lineBean = new FileBean();
-            lineBean.setHolderType( 1 );
-            zips.add( lineBean );
-
 
 
         }
@@ -289,7 +275,7 @@ public class FileUtil {
     }
 
     public static int getAllZipNumber(Context mContext){
-        return getAllZip(mContext).size()/2;
+        return getAllZip(mContext).size();
     }
 
     private static List<FileBean> getAllApk(Context mContext) {
@@ -312,6 +298,7 @@ public class FileUtil {
             String filePath = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA));
 
             File f = new File(filePath);
+            if (f.isHidden()) continue;
             FileBean fileBean = new FileBean();
             fileBean.setName(f.getName());
             fileBean.setPath(filePath);
@@ -323,9 +310,6 @@ public class FileUtil {
             fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
             fileBean.setHolderType( 0 );
             apks.add(fileBean);
-            FileBean lineBean = new FileBean();
-            lineBean.setHolderType( 1 );
-            apks.add( lineBean );
 
         }
 
@@ -335,7 +319,7 @@ public class FileUtil {
     }
 
     public static int getAllApkNumber(Context mContext){
-        return getAllApk(mContext).size()/2;
+        return getAllApk(mContext).size();
     }
 
     /*
@@ -370,6 +354,41 @@ public class FileUtil {
         else
             return cursor;
     }
+
+    /*
+    传入Context和关键字，获取文件.参看https://blog.csdn.net/zzh12138/article/details/71077909
+     */
+    public static List<FileBean> searchKeyWord(Context context, String keyword) {
+        List<FileBean> fileList = new ArrayList<FileBean>();
+        ContentResolver resolver = context.getContentResolver();
+        Uri uri = MediaStore.Files.getContentUri("external");
+        Cursor cursor = resolver.query(uri,
+                new String[]{MediaStore.Files.FileColumns.DATA},
+                MediaStore.Files.FileColumns.TITLE + " LIKE '%" + keyword + "%'",
+                null, null);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                String path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA));
+
+                File f = new File(path);
+                if (f.isHidden() || f.isDirectory()) continue;
+                FileBean fileBean = new FileBean();
+                fileBean.setName(f.getName());
+                fileBean.setPath(path);
+                fileBean.setFileType(FileUtil.getFileType(f));
+                fileBean.setChildCount( FileUtil.getFileChildCount( f ));//可有可无
+                fileBean.setSonFolderCount(FileUtil.getSonFloderCount(f));
+                fileBean.setSonFileCount(FileUtil.getSonFileCount(f));
+                fileBean.setSize( f.length() );
+                fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
+                fileBean.setHolderType( 0 );
+                fileList.add(fileBean);
+            }
+        }
+        cursor.close();
+        return fileList;
+    }
+
 
     /**
      * 字符串时间戳转时间格式
@@ -727,15 +746,15 @@ public class FileUtil {
                 return 1;
             }else {
 //                try {
-                    File file1 = new File(fileBean1.getPath());
-                    File file2 = new File(fileBean2.getPath());
-                    if (file1.lastModified() > file2.lastModified()) {
-                        return -1;// 最后修改的文件在前
-                    } else if (file1.lastModified() < file2.lastModified()) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
+                File file1 = new File(fileBean1.getPath());
+                File file2 = new File(fileBean2.getPath());
+                if (file1.lastModified() > file2.lastModified()) {
+                    return -1;// 最后修改的文件在前
+                } else if (file1.lastModified() < file2.lastModified()) {
+                    return 1;
+                } else {
+                    return 0;
+                }
 //                } catch (Exception e) {
 //                    e.printStackTrace();
 //                    return 0;

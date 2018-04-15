@@ -1,6 +1,7 @@
 package com.jjh.filemanager;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -43,7 +45,7 @@ public class LocalFileActivity extends AppCompatActivity {
     private FileAdapter fileAdapter;
     private RelativeLayout bodyRelativeLayout;
     private List<FileBean> beanList = new ArrayList<>();
-    private List<FileBean> localBeanList = new ArrayList<>();
+    private List<FileBean> localBeanList = new ArrayList<>();//接收不含分割线的列表，用于方便排序
     private File rootFile ;
     private LinearLayout empty_rel ;
     private String Path ;
@@ -51,6 +53,7 @@ public class LocalFileActivity extends AppCompatActivity {
     private TitleAdapter titleAdapter ;
     private ProgressBar progressBar;
     private int sortOrder;
+    private final int SEARCH_FILES = 7;
 //    int order = 0;
     private HashMap pathMap = new HashMap();
     private HashMap localMap = new HashMap();
@@ -75,6 +78,7 @@ public class LocalFileActivity extends AppCompatActivity {
                 showOrderDialog();
                 break;
             case R.id.activity_search:
+                showSearchDialog();
                 break;
             case R.id.activity_edit:
                 break;
@@ -83,6 +87,36 @@ public class LocalFileActivity extends AppCompatActivity {
 
     }
 
+    private void showSearchDialog() {
+    /*@setView 装入一个EditView
+     */
+        final EditText editText = new EditText(LocalFileActivity.this);
+        AlertDialog.Builder inputDialog =
+                new AlertDialog.Builder(LocalFileActivity.this);
+        inputDialog.setTitle("搜索文件").setView(editText);
+        inputDialog.setPositiveButton("取消",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+//                        Toast.makeText(LocalFileActivity.this,
+//                                editText.getText().toString(),
+//                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+        inputDialog.setNegativeButton("确定",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String fileInfo = editText.getText().toString();
+                        Intent searchIntent = new Intent(LocalFileActivity.this, ClassifyFileActivity.class);
+                        searchIntent.putExtra("Type", SEARCH_FILES);
+                        searchIntent.putExtra("Info", fileInfo);
+                        startActivity(searchIntent);
+                    }
+                }
+        );
+        inputDialog.show();
+    }
 
     // 排序选择
     private void showOrderDialog(){

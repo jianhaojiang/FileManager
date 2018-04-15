@@ -40,13 +40,25 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="100dp"
         android:background="#ffffff"
-        android:visibility="gone"
-        android:indeterminateDrawable="@drawable/progress_bar"
+        android:indeterminateDrawable="@drawable/fragment_progress_bar"
         />
 
+    <LinearLayout
+        android:id="@+id/activityClassify_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        >
+
+        <include layout="@layout/activity_bottom1"
+            android:id="@+id/sss"></include>
+
+    </LinearLayout>
+
     <RelativeLayout
-        android:layout_below="@id/activity_classify_fileState_rel"
         android:id="@+id/activity_classify_body"
+        android:layout_below="@id/activity_classify_fileState_rel"
+        android:layout_above="@id/activityClassify_bottom"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
