@@ -318,39 +318,44 @@ public class LocalFileActivity extends AppCompatActivity {
                 if ( viewHolder instanceof FileHolder ){
                     FileBean file = beanList.get(position);
                     FileType fileType = file.getFileType() ;
-                    if ( fileType == FileType.directory) {
-                        //111666
-                        if(pathMap.containsKey(file.getPath())){
-                            beanList = (List<FileBean>) pathMap.get(file.getPath());
-                            localBeanList = (List<FileBean>) localMap.get(file.getPath());
-                            fileAdapter.refresh(beanList);
-                            if ( beanList.size() > 0  ){
-                                empty_rel.setVisibility( View.GONE );
-                            }else {
-                                empty_rel.setVisibility( View.VISIBLE );
+                    try {
+                        if ( fileType == FileType.directory) {
+                            //111666
+                            if(pathMap.containsKey(file.getPath())){
+                                beanList = (List<FileBean>) pathMap.get(file.getPath());
+                                localBeanList = (List<FileBean>) localMap.get(file.getPath());
+                                fileAdapter.refresh(beanList);
+                                if ( beanList.size() > 0  ){
+                                    empty_rel.setVisibility( View.GONE );
+                                }else {
+                                    empty_rel.setVisibility( View.VISIBLE );
+                                }
+                            }else{
+                                getFile(file.getPath());
                             }
-                        }else{
-                            getFile(file.getPath());
-                        }
 
-                        refreshTitleState( file.getName() , file.getPath() );
-                    }else if ( fileType == FileType.apk ){
-                        //安装app
-                        FileUtil.openAppIntent( LocalFileActivity.this , new File( file.getPath() ) );
-                    }else if ( fileType == FileType.image ){
-                        FileUtil.openImageIntent( LocalFileActivity.this , new File( file.getPath() ));
-                    }else if ( fileType == FileType.txt ){
-                        FileUtil.openTextIntent( LocalFileActivity.this , new File( file.getPath() ) );
-                    }else if ( fileType == FileType.music ){
-                        FileUtil.openMusicIntent( LocalFileActivity.this ,  new File( file.getPath() ) );
-                    }else if ( fileType == FileType.video ){
-                        FileUtil.openVideoIntent( LocalFileActivity.this ,  new File( file.getPath() ) );
-                    }else if ( fileType == FileType.pdf ){
-                        FileUtil.openPDFIntent( LocalFileActivity.this ,  new File( file.getPath() ) );
-                    }else if ( fileType == FileType.doc ){
-                        FileUtil.openDocIntent( LocalFileActivity.this ,  new File( file.getPath() ) );
-                    }else {
-                        FileUtil.openApplicationIntent( LocalFileActivity.this , new File( file.getPath() ) );
+                            refreshTitleState( file.getName() , file.getPath() );
+                        }else if ( fileType == FileType.apk ){
+                            //安装app
+                            FileUtil.openAppIntent( LocalFileActivity.this , new File( file.getPath() ) );
+                        }else if ( fileType == FileType.image ){
+                            FileUtil.openImageIntent( LocalFileActivity.this , new File( file.getPath() ));
+                        }else if ( fileType == FileType.txt ){
+                            FileUtil.openTextIntent( LocalFileActivity.this , new File( file.getPath() ) );
+                        }else if ( fileType == FileType.music ){
+                            FileUtil.openMusicIntent( LocalFileActivity.this ,  new File( file.getPath() ) );
+                        }else if ( fileType == FileType.video ){
+                            FileUtil.openVideoIntent( LocalFileActivity.this ,  new File( file.getPath() ) );
+                        }else if ( fileType == FileType.pdf ){
+                            FileUtil.openPDFIntent( LocalFileActivity.this ,  new File( file.getPath() ) );
+                        }else if ( fileType == FileType.doc ){
+                            FileUtil.openDocIntent( LocalFileActivity.this ,  new File( file.getPath() ) );
+                        }else {
+                            FileUtil.openApplicationIntent( LocalFileActivity.this , new File( file.getPath() ) );
+                        }
+                    }catch (Exception e){
+                        Log.e(TAG, "呀！打开出现问题了");
+                        e.printStackTrace();
                     }
                 }
             }

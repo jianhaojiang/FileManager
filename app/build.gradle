@@ -1,21 +1,22 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 26//指定项目的编译版本
+    buildToolsVersion '26.0.2'//指定项目构建工具的版本
 
     defaultConfig {
         applicationId "com.jjh.app.file"
         minSdkVersion 18
-        targetSdkVersion 24
+        targetSdkVersion 24//指定已充分测试过的版本
         versionCode 1
         versionName "1.0"
         javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = true } }
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled false//表示对代码是否进行混淆
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            //代码混淆规则
         }
     }
 }
@@ -28,8 +29,8 @@ dependencies {
 //    annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.4.0'
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:recyclerview-v7:24.2.1'
+    compile 'com.android.support:appcompat-v7:26.0+'
+    compile 'com.android.support:recyclerview-v7:26.0+'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.yanzhenjie:permission:1.0.4'
     compile 'com.github.hotchemi:permissionsdispatcher:2.3.1'

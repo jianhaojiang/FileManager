@@ -38,6 +38,7 @@ public class ClassifyFileActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private FileAdapter fileAdapter;
     private RelativeLayout bodyLayout;
+    private LinearLayout activityClassify_bottom;
     private List<FileBean> beanList = new ArrayList<>();
     private List<FileBean> localBeanList = new ArrayList<>();//接收不含分割线的列表，用于方便排序
     private LinearLayout empty_rel ;
@@ -72,8 +73,11 @@ public class ClassifyFileActivity extends AppCompatActivity {
         title = (TextView) findViewById(R.id.activity_classify_title);
         progressBar = (ProgressBar)findViewById(R.id.activity_classify_progress_bar);
         progressBar.setVisibility(View.VISIBLE);
+        //加载时显示加载条，隐藏body界面和底部菜单界面
         bodyLayout = (RelativeLayout) findViewById(R.id.activity_classify_body);
         bodyLayout.setVisibility(View.GONE);
+        activityClassify_bottom = (LinearLayout) findViewById(R.id.activityClassify_bottom);
+        activityClassify_bottom.setVisibility(View.GONE);
 
         //文件为空时显示该界面，不为空时隐藏
         empty_rel = (LinearLayout)findViewById( R.id.activity_classify_empty_rel );
@@ -89,23 +93,28 @@ public class ClassifyFileActivity extends AppCompatActivity {
                 if ( viewHolder instanceof FileHolder){
                     FileBean file = beanList.get(position);
                     FileType fileType = file.getFileType() ;
-                    if ( fileType == FileType.apk ){
-                        //安装app
-                        FileUtil.openAppIntent( ClassifyFileActivity.this , new File( file.getPath() ) );
-                    }else if ( fileType == FileType.image ){
-                        FileUtil.openImageIntent( ClassifyFileActivity.this , new File( file.getPath() ));
-                    }else if ( fileType == FileType.txt ){
-                        FileUtil.openTextIntent( ClassifyFileActivity.this , new File( file.getPath() ) );
-                    }else if ( fileType == FileType.music ){
-                        FileUtil.openMusicIntent( ClassifyFileActivity.this ,  new File( file.getPath() ) );
-                    }else if ( fileType == FileType.video ){
-                        FileUtil.openVideoIntent( ClassifyFileActivity.this ,  new File( file.getPath() ) );
-                    }else if ( fileType == FileType.pdf ){
-                        FileUtil.openPDFIntent( ClassifyFileActivity.this ,  new File( file.getPath() ) );
-                    }else if ( fileType == FileType.doc ){
-                        FileUtil.openDocIntent( ClassifyFileActivity.this ,  new File( file.getPath() ) );
-                    }else {
-                        FileUtil.openApplicationIntent( ClassifyFileActivity.this , new File( file.getPath() ) );
+                    try {
+                        if ( fileType == FileType.apk ){
+                            //安装app
+                            FileUtil.openAppIntent( ClassifyFileActivity.this , new File( file.getPath() ) );
+                        }else if ( fileType == FileType.image ){
+                            FileUtil.openImageIntent( ClassifyFileActivity.this , new File( file.getPath() ));
+                        }else if ( fileType == FileType.txt ){
+                            FileUtil.openTextIntent( ClassifyFileActivity.this , new File( file.getPath() ) );
+                        }else if ( fileType == FileType.music ){
+                            FileUtil.openMusicIntent( ClassifyFileActivity.this ,  new File( file.getPath() ) );
+                        }else if ( fileType == FileType.video ){
+                            FileUtil.openVideoIntent( ClassifyFileActivity.this ,  new File( file.getPath() ) );
+                        }else if ( fileType == FileType.pdf ){
+                            FileUtil.openPDFIntent( ClassifyFileActivity.this ,  new File( file.getPath() ) );
+                        }else if ( fileType == FileType.doc ){
+                            FileUtil.openDocIntent( ClassifyFileActivity.this ,  new File( file.getPath() ) );
+                        }else {
+                            FileUtil.openApplicationIntent( ClassifyFileActivity.this , new File( file.getPath() ) );
+                        }
+                    }catch (Exception e){
+                        Log.e(TAG, "呀！打开出现问题了");
+                        e.printStackTrace();
                     }
                 }
             }
@@ -412,10 +421,12 @@ public class ClassifyFileActivity extends AppCompatActivity {
             default:
 
         }
+        //不是搜索文件跳转过来的页面时
         if(Type != SEARCH_FILE){
             if(progressBar.getVisibility() == View.VISIBLE){
                 progressBar.setVisibility(View.GONE);
                 bodyLayout.setVisibility(View.VISIBLE);
+                activityClassify_bottom.setVisibility(View.VISIBLE);
             }
             if(!localBeanList.isEmpty()){
                 //在每一项数据后面加分割线对象
@@ -465,10 +476,11 @@ public class ClassifyFileActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Object o) {
+            //文件搜索完毕时
             if(progressBar.getVisibility() == View.VISIBLE){
-//                Log.e(TAG, "显示的111111");
                 progressBar.setVisibility(View.GONE);
                 bodyLayout.setVisibility(View.VISIBLE);
+                activityClassify_bottom.setVisibility(View.VISIBLE);
             }
             if (beanList.isEmpty()){
                 empty_rel.setVisibility(View.VISIBLE);
