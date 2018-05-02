@@ -5,7 +5,7 @@ import android.view.View;
 import com.jjh.filemanager.adapter.FileAdapter;
 
 /**
- * Created by ${zhaoyanjun} on 2017/1/12.
+ *
  */
 
 public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {

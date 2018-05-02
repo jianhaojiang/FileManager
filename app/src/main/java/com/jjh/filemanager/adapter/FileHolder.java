@@ -13,7 +13,7 @@ import com.jjh.filemanager.bean.FileType;
 import java.io.File;
 
 /**
- * Created by ${zhaoyanjun} on 2017/1/12.
+ *
  */
 
 public class FileHolder extends RecyclerViewHolder<FileHolder> {

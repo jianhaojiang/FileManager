@@ -4,7 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 /**
- * Created by ${zhaoyanjun} on 2017/1/12.
+ *
  */
 
 public abstract class RecyclerViewHolder<T> extends RecyclerView.ViewHolder {

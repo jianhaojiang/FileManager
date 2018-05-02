@@ -9,7 +9,7 @@ import com.jjh.filemanager.adapter.base.RecyclerViewHolder;
 import com.jjh.filemanager.bean.TitlePath;
 
 /**
- * Created by ${zhaoyanjun} on 2017/1/12.
+ *
  */
 
 public class TitleHolder extends RecyclerViewHolder<TitleHolder> {

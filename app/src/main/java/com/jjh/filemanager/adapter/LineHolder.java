@@ -6,7 +6,7 @@ import com.jjh.filemanager.adapter.base.RecyclerViewAdapter;
 import com.jjh.filemanager.adapter.base.RecyclerViewHolder;
 
 /**
- * Created by ${zhaoyanjun} on 2017/1/12.
+ *
  */
 
 public class LineHolder extends RecyclerViewHolder<LineHolder> {

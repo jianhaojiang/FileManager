@@ -12,7 +12,7 @@ import com.jjh.filemanager.bean.TitlePath;
 import java.util.List;
 
 /**
- * Created by ${zhaoyanjun} on 2017/1/13.
+ *
  */
 
 public class TitleAdapter extends RecyclerViewAdapter {

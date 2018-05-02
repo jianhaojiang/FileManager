@@ -11,7 +11,7 @@ import com.jjh.filemanager.bean.FileBean;
 import java.util.List;
 
 /**
- * Created by ${zhaoyanjun} on 2017/1/11.
+ *
  */
 
 public class FileAdapter extends RecyclerViewAdapter {

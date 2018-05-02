@@ -15,7 +15,7 @@ import com.jjh.filemanager.R;
 import com.jjh.filemanager.fragment.adapter.FragAdapter;
 
 /**
- * Created by gdlocal on 2018/1/23.
+ *
  */
 
 public class localFileFragment extends Fragment {
