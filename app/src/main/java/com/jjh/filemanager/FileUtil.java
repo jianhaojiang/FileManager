@@ -3,6 +3,7 @@ package com.jjh.filemanager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
 import android.os.storage.StorageManager;
@@ -27,6 +28,7 @@ import android.database.Cursor;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Files;
 import android.provider.MediaStore.Files.FileColumns;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 
 /**
@@ -77,7 +79,6 @@ public class FileUtil {
 //            fileBean.setSonFileCount(0);
             fileBean.setSize( f.length() );
             fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
-            fileBean.setHolderType( 0 );
             photos.add(fileBean);
 
 //            Log.e("phone_photo",  " -- " + filePath);
@@ -122,7 +123,6 @@ public class FileUtil {
 //            fileBean.setSonFileCount(0);
             fileBean.setSize( f.length() );
             fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
-            fileBean.setHolderType( 0 );
             musics.add(fileBean);
 
 
@@ -165,7 +165,6 @@ public class FileUtil {
 //            fileBean.setSonFileCount(0);
             fileBean.setSize( f.length() );
             fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
-            fileBean.setHolderType( 0 );
             videos.add(fileBean);
 
         }
@@ -216,7 +215,6 @@ public class FileUtil {
 //            fileBean.setSonFileCount(0);
             fileBean.setSize( f.length() );
             fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
-            fileBean.setHolderType( 0 );
             texts.add(fileBean);
 
         }
@@ -263,7 +261,6 @@ public class FileUtil {
 //            fileBean.setSonFileCount(0);
             fileBean.setSize( f.length() );
             fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
-            fileBean.setHolderType( 0 );
             zips.add(fileBean);
 
 
@@ -308,7 +305,6 @@ public class FileUtil {
 //            fileBean.setSonFileCount(0);
             fileBean.setSize( f.length() );
             fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
-            fileBean.setHolderType( 0 );
             apks.add(fileBean);
 
         }
@@ -381,7 +377,6 @@ public class FileUtil {
                 fileBean.setSonFileCount(FileUtil.getSonFileCount(f));
                 fileBean.setSize( f.length() );
                 fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
-                fileBean.setHolderType( 0 );
                 fileList.add(fileBean);
             }
         }
@@ -849,7 +844,7 @@ public class FileUtil {
 
    /*
     android intent中设置如下flag，可以清除栈顶的activity：
-    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);添加这一句表示对目标应用临时授权该Uri所代表的文件
     还有其他tag如下：
     1.FLAG_ACTIVITY_CLEAR_TOP：跳转到的activity若已在栈中存在，则将其上的activity都销掉。
     2.FLAG_ACTIVITY_NEW_TASK：activity要存在于activity的栈中，而非activity的途径启动activity时必然不存在一个
@@ -866,7 +861,15 @@ public class FileUtil {
      */
     public static void openAppIntent(Context context , File file ){
         Intent intent = new Intent(Intent.ACTION_VIEW);//显示数据的通用intent
-        intent.setDataAndType(Uri.fromFile( file ), "application/vnd.android.package-archive");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Uri uri = FileProvider.getUriForFile(context,
+                    context.getApplicationContext().getPackageName() + ".provider", file);
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.setDataAndType(uri, "application/vnd.android.package-archive");
+        }else {
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+        }
         context.startActivity(intent);
     }
 
@@ -876,11 +879,20 @@ public class FileUtil {
      * @param file
      */
     public static void openImageIntent( Context context , File file ) {
-        Uri path = Uri.fromFile(file);
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addCategory("android.intent.category.DEFAULT");
-        intent.setDataAndType(path, "image/*");
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Uri uri = FileProvider.getUriForFile(context,
+                    context.getApplicationContext().getPackageName() + ".provider", file);
+            intent.setDataAndType(uri, "image/*");
+//            Log.e(context.getPackageName(), "openImageIntent111: 222" );
+
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }else {
+//            Log.e(context.getPackageName(), "openImageIntent111: 111" );
+            intent.setDataAndType(Uri.fromFile(file), "image/*");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
         context.startActivity(intent);
     }
 
@@ -890,11 +902,17 @@ public class FileUtil {
      * @param file
      */
     public static void openPDFIntent( Context context , File file ) {
-        Uri path = Uri.fromFile(file);
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addCategory("android.intent.category.DEFAULT");
-        intent.setDataAndType(path, "application/pdf");
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Uri uri = FileProvider.getUriForFile(context,
+                    context.getApplicationContext().getPackageName() + ".provider", file);
+            intent.setDataAndType(uri, "application/pdf");
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }else {
+            intent.setDataAndType(Uri.fromFile(file), "application/pdf");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
         context.startActivity(intent);
     }
 
@@ -904,11 +922,17 @@ public class FileUtil {
      * @param file
      */
     public static void openDocIntent( Context context , File file ) {
-        Uri path = Uri.fromFile(file);
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addCategory("android.intent.category.DEFAULT");
-        intent.setDataAndType(path, "application/msword");
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Uri uri = FileProvider.getUriForFile(context,
+                    context.getApplicationContext().getPackageName() + ".provider", file);
+            intent.setDataAndType(uri, "application/msword");
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }else {
+            intent.setDataAndType(Uri.fromFile(file), "application/msword");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
         context.startActivity(intent);
     }
 
@@ -919,11 +943,17 @@ public class FileUtil {
      * @param file
      */
     public static void openTextIntent( Context context , File file ) {
-        Uri path = Uri.fromFile(file);
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addCategory("android.intent.category.DEFAULT");
-        intent.setDataAndType(path, "text/*");
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Uri uri = FileProvider.getUriForFile(context,
+                    context.getApplicationContext().getPackageName() + ".provider", file);
+            intent.setDataAndType(uri, "text/*");
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }else {
+            intent.setDataAndType(Uri.fromFile(file), "text/*");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
         context.startActivity(intent);
     }
 
@@ -933,10 +963,17 @@ public class FileUtil {
      * @param file
      */
     public static void openMusicIntent( Context context , File file ){
-        Uri path = Uri.fromFile(file);
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.setDataAndType(path, "audio/*");
+        intent.addCategory("android.intent.category.DEFAULT");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Uri uri = FileProvider.getUriForFile(context,
+                    context.getApplicationContext().getPackageName() + ".provider", file);
+            intent.setDataAndType(uri, "audio/*");
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }else {
+            intent.setDataAndType(Uri.fromFile(file), "audio/*");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
         context.startActivity(intent);
     }
 
@@ -946,11 +983,19 @@ public class FileUtil {
      * @param file
      */
     public static void openVideoIntent( Context context , File file ){
-        Uri path = Uri.fromFile(file);
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.setDataAndType(path, "video/*");
+        intent.addCategory("android.intent.category.DEFAULT");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Uri uri = FileProvider.getUriForFile(context,
+                    context.getApplicationContext().getPackageName() + ".provider", file);
+            intent.setDataAndType(uri, "video/*");
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }else {
+            intent.setDataAndType(Uri.fromFile(file), "video/*");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
         context.startActivity(intent);
+
     }
 
     /**
@@ -959,11 +1004,19 @@ public class FileUtil {
      * @param file
      */
     public static void openApplicationIntent( Context context , File file ){
-        Uri path = Uri.fromFile(file);
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.setDataAndType(path, "application/*");
+        intent.addCategory("android.intent.category.DEFAULT");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Uri uri = FileProvider.getUriForFile(context,
+                    context.getApplicationContext().getPackageName() + ".provider", file);
+            intent.setDataAndType(uri, "application/*");
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }else {
+            intent.setDataAndType(Uri.fromFile(file), "application/*");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
         context.startActivity(intent);
+
     }
 
     /**
@@ -972,11 +1025,20 @@ public class FileUtil {
      * @param file
      */
     public static void sendFile( Context context , File file ){
-        Intent share = new Intent(Intent.ACTION_SEND);
-        share.putExtra(Intent.EXTRA_STREAM,
-                Uri.fromFile(file));
-        share.setType("*/*");//此处可发送多种文件
-        context.startActivity(Intent.createChooser(share, "发送"));
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.addCategory("android.intent.category.DEFAULT");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Uri uri = FileProvider.getUriForFile(context,
+                    context.getApplicationContext().getPackageName() + ".provider", file);
+            intent.putExtra(Intent.EXTRA_STREAM, uri);
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.setType("*/*");//此处可发送多种文件
+        }else {
+            intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setType("*/*");//此处可发送多种文件
+        }
+        context.startActivity(Intent.createChooser(intent, "发送"));
     }
 
     public static List<FileBean> getPhotos() {

@@ -13,7 +13,6 @@ public class FileBean {
     private int sonFolderCount;
     private int childCount ;
     private long size ;
-    private int holderType ;
     private String date;
 
     public String getDate() {
@@ -62,14 +61,6 @@ public class FileBean {
 
     public void setSize(long size) {
         this.size = size;
-    }
-
-    public int getHolderType() {
-        return holderType;
-    }
-
-    public void setHolderType(int holderType) {
-        this.holderType = holderType;
     }
 
     public int getSonFileCount() { return sonFileCount; }

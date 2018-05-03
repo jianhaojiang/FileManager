@@ -40,7 +40,6 @@ public class ClassifyFileActivity extends AppCompatActivity {
     private RelativeLayout bodyLayout;
     private LinearLayout activityClassify_bottom;
     private List<FileBean> beanList = new ArrayList<>();
-    private List<FileBean> localBeanList = new ArrayList<>();//接收不含分割线的列表，用于方便排序
     private LinearLayout empty_rel ;
     private int Type;
     private ProgressBar progressBar;
@@ -113,7 +112,7 @@ public class ClassifyFileActivity extends AppCompatActivity {
                             FileUtil.openApplicationIntent( ClassifyFileActivity.this , new File( file.getPath() ) );
                         }
                     }catch (Exception e){
-                        Log.e(TAG, "呀！打开出现问题了");
+                        Log.e(TAG, "呀！打开出现问题了" + e.getMessage());
                         e.printStackTrace();
                     }
                 }
@@ -174,27 +173,16 @@ public class ClassifyFileActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         List<FileBean> localList = new ArrayList<>();
-                        String fileInfo = editText.getText().toString();
-                        if(!localBeanList.isEmpty() || fileInfo != null && fileInfo != ""){
-                            //在每一项数据后面加分割线对象
-                            Iterator it = localBeanList.iterator();
+                        String fileInfo = editText.getText().toString().trim();
+                        if(!beanList.isEmpty() && fileInfo != null && !"".equals(fileInfo) ){
+                            Iterator it = beanList.iterator();
                             FileBean localFileBean = new FileBean();
                             while(it.hasNext()) {
                                 localFileBean = (FileBean)it.next();
-                                if(localFileBean.getName().contains(fileInfo)){
+                                if(localFileBean.getName().contains(fileInfo.toUpperCase()) ||
+                                        localFileBean.getName().contains(fileInfo.toLowerCase())){
                                     localList.add(localFileBean);
                                 }
-                            }
-                        }
-                        localBeanList = localList;
-                        localList = new ArrayList<>();;
-                        if(!localBeanList.isEmpty()){
-                            Iterator it = localBeanList.iterator();
-                            while(it.hasNext()) {
-                                localList.add((FileBean) it.next());
-                                FileBean lineBean = new FileBean();
-                                lineBean.setHolderType( 1 );
-                                localList.add( lineBean );
                             }
                         }
                         beanList = localList;
@@ -241,56 +229,16 @@ public class ClassifyFileActivity extends AppCompatActivity {
                                 break;
                             case 0:
 //                                Toast.makeText(LocalFileActivity.this, "你选择了0jj", Toast.LENGTH_SHORT).show();
-                                Collections.sort( localBeanList , FileUtil.comparatorNameDesc );
-                                if(!localBeanList.isEmpty()){
-                                    Iterator it = localBeanList.iterator();
-                                    while(it.hasNext()) {
-                                        localList.add((FileBean) it.next());
-                                        FileBean lineBean = new FileBean();
-                                        lineBean.setHolderType( 1 );
-                                        localList.add( lineBean );
-                                    }
-                                }
-                                beanList = localList;
+                                Collections.sort( beanList , FileUtil.comparatorNameDesc );
                                 break;
                             case 1:
-                                Collections.sort( localBeanList , FileUtil.comparatorSizeDesc );
-                                if(!localBeanList.isEmpty()){
-                                    Iterator it = localBeanList.iterator();
-                                    while(it.hasNext()) {
-                                        localList.add((FileBean) it.next());
-                                        FileBean lineBean = new FileBean();
-                                        lineBean.setHolderType( 1 );
-                                        localList.add( lineBean );
-                                    }
-                                }
-                                beanList = localList;
+                                Collections.sort( beanList , FileUtil.comparatorSizeDesc );
                                 break;
                             case 2:
-                                Collections.sort( localBeanList , FileUtil.comparatorTypeDesc );
-                                if(!localBeanList.isEmpty()){
-                                    Iterator it = localBeanList.iterator();
-                                    while(it.hasNext()) {
-                                        localList.add((FileBean) it.next());
-                                        FileBean lineBean = new FileBean();
-                                        lineBean.setHolderType( 1 );
-                                        localList.add( lineBean );
-                                    }
-                                }
-                                beanList = localList;
+                                Collections.sort( beanList , FileUtil.comparatorTypeDesc );
                                 break;
                             case 3:
-                                Collections.sort( localBeanList , FileUtil.comparatorDateDesc );
-                                if(!localBeanList.isEmpty()){
-                                    Iterator it = localBeanList.iterator();
-                                    while(it.hasNext()) {
-                                        localList.add((FileBean) it.next());
-                                        FileBean lineBean = new FileBean();
-                                        lineBean.setHolderType( 1 );
-                                        localList.add( lineBean );
-                                    }
-                                }
-                                beanList = localList;
+                                Collections.sort( beanList , FileUtil.comparatorDateDesc );
                                 break;
                             default: break;
                         }
@@ -313,56 +261,16 @@ public class ClassifyFileActivity extends AppCompatActivity {
                             case -1:
                                 break;
                             case 0:
-                                Collections.sort( localBeanList , FileUtil.comparatorNameAsc );
-                                if(!localBeanList.isEmpty()){
-                                    Iterator it = localBeanList.iterator();
-                                    while(it.hasNext()) {
-                                        localList.add((FileBean) it.next());
-                                        FileBean lineBean = new FileBean();
-                                        lineBean.setHolderType( 1 );
-                                        localList.add( lineBean );
-                                    }
-                                }
-                                beanList = localList;
+                                Collections.sort( beanList , FileUtil.comparatorNameAsc );
                                 break;
                             case 1:
-                                Collections.sort( localBeanList , FileUtil.comparatorSizeAsc );
-                                if(!localBeanList.isEmpty()){
-                                    Iterator it = localBeanList.iterator();
-                                    while(it.hasNext()) {
-                                        localList.add((FileBean) it.next());
-                                        FileBean lineBean = new FileBean();
-                                        lineBean.setHolderType( 1 );
-                                        localList.add( lineBean );
-                                    }
-                                }
-                                beanList = localList;
+                                Collections.sort( beanList , FileUtil.comparatorSizeAsc );
                                 break;
                             case 2:
-                                Collections.sort( localBeanList , FileUtil.comparatorTypeAsc );
-                                if(!localBeanList.isEmpty()){
-                                    Iterator it = localBeanList.iterator();
-                                    while(it.hasNext()) {
-                                        localList.add((FileBean) it.next());
-                                        FileBean lineBean = new FileBean();
-                                        lineBean.setHolderType( 1 );
-                                        localList.add( lineBean );
-                                    }
-                                }
-                                beanList = localList;
+                                Collections.sort( beanList , FileUtil.comparatorTypeAsc );
                                 break;
                             case 3:
-                                Collections.sort( localBeanList , FileUtil.comparatorDateAsc );
-                                if(!localBeanList.isEmpty()){
-                                    Iterator it = localBeanList.iterator();
-                                    while(it.hasNext()) {
-                                        localList.add((FileBean) it.next());
-                                        FileBean lineBean = new FileBean();
-                                        lineBean.setHolderType( 1 );
-                                        localList.add( lineBean );
-                                    }
-                                }
-                                beanList = localList;
+                                Collections.sort( beanList , FileUtil.comparatorDateAsc );
                                 break;
                             default: break;
                         }
@@ -383,7 +291,6 @@ public class ClassifyFileActivity extends AppCompatActivity {
     public void browsePath(){
         //根据点击的不同存储地址显示文件列表
         Type = getIntent().getIntExtra("Type",0);
-        List<FileBean> localList = new ArrayList<>();
         switch (Type){
             case 0:
                 Log.e(TAG, "ERROR" );
@@ -392,27 +299,27 @@ public class ClassifyFileActivity extends AppCompatActivity {
                 break;
             case TYPE_MUSIC:
                 title.setText("音乐");
-                localBeanList = FileUtil.getMusics();
+                beanList = FileUtil.getMusics();
                 break;
             case TYPE_IMAGE:
                 title.setText("图片");
-                localBeanList = FileUtil.getPhotos();
+                beanList = FileUtil.getPhotos();
                 break;
             case TYPE_TXT:
                 title.setText("文档>");
-                localBeanList = FileUtil.getTexts();
+                beanList = FileUtil.getTexts();
                 break;
             case TYPE_VIDEO:
                 title.setText("视频");
-                localBeanList = FileUtil.getVideos();
+                beanList = FileUtil.getVideos();
                 break;
             case TYPE_APK:
                 title.setText("安装包");
-                localBeanList = FileUtil.getApks();
+                beanList = FileUtil.getApks();
                 break;
             case TYPE_ZIP:
                 title.setText("压缩包");
-                localBeanList = FileUtil.getZips();
+                beanList = FileUtil.getZips();
                 break;
             case SEARCH_FILE:
                 title.setText("搜索结果");
@@ -428,22 +335,11 @@ public class ClassifyFileActivity extends AppCompatActivity {
                 bodyLayout.setVisibility(View.VISIBLE);
                 activityClassify_bottom.setVisibility(View.VISIBLE);
             }
-            if(!localBeanList.isEmpty()){
-                //在每一项数据后面加分割线对象
-                Iterator it = localBeanList.iterator();
-                while(it.hasNext()) {
-                    localList.add((FileBean) it.next());
-                    FileBean lineBean = new FileBean();
-                    lineBean.setHolderType( 1 );
-                    localList.add( lineBean );
-                }
-            }
-            if (localList.isEmpty()){
+            if (beanList.isEmpty()){
                 empty_rel.setVisibility(View.VISIBLE);
             }else {
                 empty_rel.setVisibility(View.GONE);
             }
-            beanList = localList;
             fileAdapter.refresh(beanList);
         }
 
@@ -452,23 +348,11 @@ public class ClassifyFileActivity extends AppCompatActivity {
     class SearchFile extends AsyncTask {
         @Override
         protected Object doInBackground(Object[] params) {
-            List<FileBean> localList = new ArrayList<>();
             String fileInfo = getIntent().getStringExtra("Info").trim();
-            if(fileInfo != null && fileInfo != ""){
-                localBeanList = FileUtil.searchKeyWord(ClassifyFileActivity.this, fileInfo);
-                if(!localBeanList.isEmpty()){
-                    //在每一项数据后面加分割线对象
-                    Iterator it = localBeanList.iterator();
-                    while(it.hasNext()) {
-                        localList.add((FileBean) it.next());
-                        FileBean lineBean = new FileBean();
-                        lineBean.setHolderType( 1 );
-                        localList.add( lineBean );
-                    }
-                }
-                beanList = localList;
+            if(fileInfo != null && !"".equals(fileInfo)){
+                beanList = FileUtil.searchKeyWord(ClassifyFileActivity.this, fileInfo);
             }else {
-                beanList = null;
+                beanList = new ArrayList<>();
             }
 
             return true;

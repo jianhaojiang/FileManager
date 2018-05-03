@@ -29,13 +29,8 @@ public class FileAdapter extends RecyclerViewAdapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view ;
-        if ( viewType == 0 ){
             view = mLayoutInflater.inflate(R.layout.list_item_file, parent, false) ;
             return new FileHolder( view );
-        }else {
-            view = mLayoutInflater.inflate(R.layout.list_item_line , parent, false) ;
-            return new LineHolder( view );
-        }
     }
 
     @Override
@@ -44,9 +39,6 @@ public class FileAdapter extends RecyclerViewAdapter {
         if ( holder instanceof  FileHolder ){
             FileHolder fileHolder = (FileHolder) holder;
             fileHolder.onBindViewHolder( fileHolder , this , position );
-        }else if ( holder instanceof  LineHolder ){
-            LineHolder lineHolder = (LineHolder) holder ;
-            lineHolder.onBindViewHolder( lineHolder , this , position );
         }
     }
 
@@ -60,10 +52,7 @@ public class FileAdapter extends RecyclerViewAdapter {
         return list.get( positon );
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        return list.get( position).getHolderType() ;
-    }
+
 
     @Override
     public int getItemCount() {
