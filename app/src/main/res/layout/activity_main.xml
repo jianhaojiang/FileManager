@@ -31,6 +31,6 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:background="#f4f3f3"
-        android:padding="@dimen/activity_horizontal_margin"/>
+        />
 
 </LinearLayout>

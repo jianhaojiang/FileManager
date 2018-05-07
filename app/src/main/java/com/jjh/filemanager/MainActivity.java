@@ -39,7 +39,7 @@ import permissions.dispatcher.PermissionRequest;
 import permissions.dispatcher.RuntimePermissions;
 
 @RuntimePermissions
-public class MainActivity extends FragmentActivity implements View.OnClickListener{
+public class MainActivity extends FragmentActivity{
 
     private ViewPager vp;
     private RadioGroup rgTabButtons;
@@ -72,8 +72,10 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     public void initView(){
         //构造适配器
         List<Fragment> fragments = new ArrayList<Fragment>();
-        fragments.add(new localFileFragment());
-        fragments.add(new classifyFileFragment());
+        localFileFragment localFileFragment = new localFileFragment();
+        classifyFileFragment classifyFileFragment = new classifyFileFragment();
+        fragments.add(localFileFragment);
+        fragments.add(classifyFileFragment);
         FragAdapter adapter = new FragAdapter(getSupportFragmentManager(), fragments);
 
         //设定适配器，使用ViewPager实现滑动两个fragment.
@@ -89,7 +91,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         // 只有在PagerView显示后才行即onCreate运行结束，于是在AsyncTask里面刷新
     }
 
-    @Override
+    //在xml文件指明的点击方法，并非重写的监听事件
     public void onClick(View v) {
         String rootPath = Environment.getExternalStorageDirectory().getAbsolutePath();//手机自带外部存储根目录;
         String SDPath = FileUtil.getExtendedMemoryPath(MainActivity.this);
@@ -108,6 +110,10 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 externalIntent.putExtra("Path", SDPath);
                 externalIntent.putExtra("flagPath", flagPath);
                 startActivity(externalIntent);
+                break;
+            case R.id.private_storage:
+                Intent privateIntent = new Intent(MainActivity.this, GestureLockActivity.class);
+                startActivity(privateIntent);
                 break;
             case R.id.classify_music:
                 Intent musicsIntent = new Intent(MainActivity.this, ClassifyFileActivity.class);

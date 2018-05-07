@@ -9,7 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
@@ -53,7 +55,7 @@ public class LocalFileActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private int sortOrder;
     private final int SEARCH_FILES = 7;
-//    int order = 0;
+    private FileBean longClickFileBean;
     private HashMap pathMap = new HashMap();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +84,30 @@ public class LocalFileActivity extends AppCompatActivity {
             default:
         }
 
+    }
+
+    private void showAttributeDialog(){
+        /* @setIcon 设置对话框图标
+         * @setTitle 设置对话框标题
+         * @setMessage 设置对话框消息提示
+         * setXXX方法返回Dialog对象，因此可以链式设置属性
+         */
+        final AlertDialog.Builder normalDialog =
+                new AlertDialog.Builder(LocalFileActivity.this);
+        normalDialog.setMessage(
+                "文件名称：" + longClickFileBean.getName() + "\n" +
+                        "文件大小：" + FileUtil.sizeToChange(longClickFileBean.getSize()) + "\n" +
+                        "修改时间：" + longClickFileBean.getDate() + "\n" +
+                        "文件位置：\n" + longClickFileBean.getPath());
+        normalDialog.setPositiveButton("确定",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //...To-do
+                    }
+                });
+        // 显示
+        normalDialog.show();
     }
 
     private void showSearchDialog() {
@@ -228,6 +254,8 @@ public class LocalFileActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         //添加适配器
         recyclerView.setAdapter(fileAdapter);
+        //给recyclerview注册长按监听
+        registerForContextMenu(recyclerView);
         fileAdapter.setOnItemClickListener(new RecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, RecyclerView.ViewHolder viewHolder, int position) {
@@ -279,13 +307,13 @@ public class LocalFileActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(View view, RecyclerView.ViewHolder viewHolder, int position) {
                 if ( viewHolder instanceof  FileHolder ){
-                    FileBean fileBean = (FileBean) fileAdapter.getItem( position );
-                    FileType fileType = fileBean.getFileType() ;
+                    longClickFileBean = (FileBean) fileAdapter.getItem( position );
+                    FileType fileType = longClickFileBean.getFileType() ;
                     if ( fileType != null && fileType != FileType.directory ){
-                        FileUtil.sendFile( LocalFileActivity.this , new File( fileBean.getPath() ) );
+                        return false;
                     }
                 }
-                return false;
+                return true;
             }
         });
 
@@ -312,6 +340,26 @@ public class LocalFileActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.context_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.menu_encryption) {
+            Toast.makeText(this, "加密被选择了", Toast.LENGTH_SHORT).show();
+        } else if (item.getItemId() == R.id.menu_attribute) {
+            showAttributeDialog();
+        }else if (item.getItemId() == R.id.menu_share) {
+            FileUtil.sendFile( LocalFileActivity.this , new File( longClickFileBean.getPath() ) );
+        }
+        return super.onContextItemSelected(item);
     }
 
     public void browsePath(){
@@ -386,6 +434,7 @@ public class LocalFileActivity extends AppCompatActivity {
                         FileBean fileBean = new FileBean();
                         fileBean.setName(f.getName());
                         fileBean.setPath(f.getAbsolutePath());
+//                        Log.d(TAG, "doInBackground: " +  File.separator  +"路径" + f.getAbsolutePath());
                         fileBean.setFileType( FileUtil.getFileType( f ));
                         fileBean.setChildCount( FileUtil.getFileChildCount( f ));
                         fileBean.setSonFolderCount(FileUtil.getSonFloderCount(f));

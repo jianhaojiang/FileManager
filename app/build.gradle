@@ -29,11 +29,12 @@ dependencies {
 //    annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.4.0'
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
-    compile 'com.android.support:appcompat-v7:26.0+'
-    compile 'com.android.support:recyclerview-v7:26.0+'
+    compile 'com.android.support:appcompat-v7:26.0.+'
+    compile 'com.android.support:recyclerview-v7:26.0.+'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.yanzhenjie:permission:1.0.4'
     compile 'com.github.hotchemi:permissionsdispatcher:2.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
+    compile 'com.github.jianhaojiang:GestureLock:1.0.0'
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.3.2'
 }

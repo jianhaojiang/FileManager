@@ -9,6 +9,9 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -22,6 +25,7 @@ import com.jjh.filemanager.adapter.FileHolder;
 import com.jjh.filemanager.adapter.base.RecyclerViewAdapter;
 import com.jjh.filemanager.bean.FileBean;
 import com.jjh.filemanager.bean.FileType;
+import com.jjh.filemanager.bean.TitlePath;
 import com.jjh.filemanager.fragment.classifyFileFragment;
 
 import java.io.File;
@@ -50,6 +54,8 @@ public class ClassifyFileActivity extends AppCompatActivity {
     private final int TYPE_APK   = 5;
     private final int TYPE_ZIP   = 6;
     private final int SEARCH_FILE   = 7;
+    private final int PRIVATE_FILE   = 8;
+    private FileBean longClickFileBean;
     private int sortOrder;
 
 
@@ -86,6 +92,8 @@ public class ClassifyFileActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         //添加适配器
         recyclerView.setAdapter(fileAdapter);
+        //给recyclerview注册长按监听
+        registerForContextMenu(recyclerView);
         fileAdapter.setOnItemClickListener(new RecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, RecyclerView.ViewHolder viewHolder, int position) {
@@ -124,17 +132,38 @@ public class ClassifyFileActivity extends AppCompatActivity {
         fileAdapter.setOnItemLongClickListener(new RecyclerViewAdapter.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(View view, RecyclerView.ViewHolder viewHolder, int position) {
-                if ( viewHolder instanceof  FileHolder ){
-                    FileBean fileBean = (FileBean) fileAdapter.getItem( position );
-                    FileType fileType = fileBean.getFileType() ;
-                    if ( fileType != null && fileType != FileType.directory ){
-                        FileUtil.sendFile( ClassifyFileActivity.this , new File( fileBean.getPath() ) );
-                    }
+            if ( viewHolder instanceof  FileHolder ){
+                longClickFileBean = (FileBean) fileAdapter.getItem( position );
+                FileType fileType = longClickFileBean.getFileType() ;
+                if ( fileType != null && fileType != FileType.directory ){
+                    return false;
                 }
-                return false;
+            }
+            return true;
             }
         });
 
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.context_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.menu_encryption) {
+            Toast.makeText(this, "加密被选择了", Toast.LENGTH_SHORT).show();
+        } else if (item.getItemId() == R.id.menu_attribute) {
+            showAttributeDialog();
+//            Toast.makeText(this, "属性被选择了", Toast.LENGTH_SHORT).show();
+        }else if (item.getItemId() == R.id.menu_share) {
+            FileUtil.sendFile( ClassifyFileActivity.this , new File( longClickFileBean.getPath() ) );
+        }
+        return super.onContextItemSelected(item);
     }
 
     public void onClickMenu(View v){
@@ -150,6 +179,30 @@ public class ClassifyFileActivity extends AppCompatActivity {
             default:
         }
 
+    }
+
+    private void showAttributeDialog(){
+        /* @setIcon 设置对话框图标
+         * @setTitle 设置对话框标题
+         * @setMessage 设置对话框消息提示
+         * setXXX方法返回Dialog对象，因此可以链式设置属性
+         */
+        final AlertDialog.Builder normalDialog =
+                new AlertDialog.Builder(ClassifyFileActivity.this);
+        normalDialog.setMessage(
+                "文件名称：" + longClickFileBean.getName() + "\n" +
+                "文件大小：" + FileUtil.sizeToChange(longClickFileBean.getSize()) + "\n" +
+                "修改时间：" + longClickFileBean.getDate() + "\n" +
+                "文件位置：\n" + longClickFileBean.getPath());
+        normalDialog.setPositiveButton("确定",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //...To-do
+                    }
+                });
+        // 显示
+        normalDialog.show();
     }
 
     private void showSearchDialog() {
@@ -306,7 +359,7 @@ public class ClassifyFileActivity extends AppCompatActivity {
                 beanList = FileUtil.getPhotos();
                 break;
             case TYPE_TXT:
-                title.setText("文档>");
+                title.setText("文档");
                 beanList = FileUtil.getTexts();
                 break;
             case TYPE_VIDEO:
@@ -324,6 +377,9 @@ public class ClassifyFileActivity extends AppCompatActivity {
             case SEARCH_FILE:
                 title.setText("搜索结果");
                 new SearchFile().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , "") ;
+                break;
+            case PRIVATE_FILE:
+                title.setText("私人目录");
                 break;
             default:
 
@@ -373,6 +429,21 @@ public class ClassifyFileActivity extends AppCompatActivity {
             }
             fileAdapter.refresh(beanList);
         }
+    }
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+            if(Type == PRIVATE_FILE){
+                Intent privateIntent = new Intent(ClassifyFileActivity.this, MainActivity.class);
+                startActivity(privateIntent);
+                finish();
+                return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
 }
