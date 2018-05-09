@@ -23,9 +23,13 @@ public class localFileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_local_file, container, false);
-        new RefreshTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , "") ;
-
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        new RefreshTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , "") ;
     }
 
     class RefreshTask extends AsyncTask {
@@ -40,11 +44,6 @@ public class localFileFragment extends Fragment {
 
         @Override
         protected Object doInBackground(Object[] params) {
-//            try{
-//                Thread.sleep(100);//等待onCreate结束再执行刷新界面的作用
-//            }catch (Exception e){
-//                e.printStackTrace();
-//            }
 
             rootPath = Environment.getExternalStorageDirectory().getAbsolutePath();//手机自带外部存储根目录
             totalPath = Environment.getDataDirectory().getPath();  //手机所有文件根目录

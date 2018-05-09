@@ -8,6 +8,11 @@
     <!--在ContextMenu(上下文菜单)中不支持图标android:icon="@drawable/attribute"
     -->
     <item
+        android:id="@+id/menu_deciphering"
+        android:visible="false"
+        android:title="解密"
+        />
+    <item
         android:id="@+id/menu_attribute"
         android:title="属性"
         />

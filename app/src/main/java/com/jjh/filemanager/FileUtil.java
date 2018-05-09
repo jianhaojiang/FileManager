@@ -2,6 +2,7 @@ package com.jjh.filemanager;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -10,10 +11,13 @@ import android.os.storage.StorageManager;
 
 import com.jjh.filemanager.bean.FileBean;
 import com.jjh.filemanager.bean.FileType;
+
 import java.io.File;
+import java.io.FileInputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -39,13 +43,25 @@ public class FileUtil {
     private static List<FileBean> photos = new ArrayList<>();
     private static List<FileBean> musics = new ArrayList<>();
     private static List<FileBean> videos = new ArrayList<>();
-    private static List<FileBean> texts  = new ArrayList<>();
-    private static List<FileBean> zips   = new ArrayList<>();
-    private static List<FileBean> apks   = new ArrayList<>();
+    private static List<FileBean> texts = new ArrayList<>();
+    private static List<FileBean> zips = new ArrayList<>();
+    private static List<FileBean> apks = new ArrayList<>();
+
+    public static void  updateExternalDB(String filename, Context mContext)//filename是我们的文件全名，包括后缀和路径
+    {
+        MediaScannerConnection.scanFile(mContext,
+                new String[] { filename }, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+                    public void onScanCompleted(String path, Uri uri) {
+//                        Log.i("ExternalStorage", "Scanned " + path + ":");
+//                        Log.i("ExternalStorage", "-> uri=" + uri);
+                    }
+                });
+    }
 
     private static List<FileBean> getAllPhoto(Context mContext) {
 
-        ContentResolver mContentResolver =  mContext.getContentResolver();
+        ContentResolver mContentResolver = mContext.getContentResolver();
         photos.clear();
         String[] projection = new String[]{
                 MediaStore.Images.ImageColumns.DATA,};
@@ -73,11 +89,11 @@ public class FileUtil {
             FileBean fileBean = new FileBean();
             fileBean.setName(f.getName());
             fileBean.setPath(filePath);
-            fileBean.setFileType( FileType.image);
+            fileBean.setFileType(FileType.image);
 //            fileBean.setChildCount(0);int在类中默认初始化值为0
 //            fileBean.setSonFolderCount(0);
 //            fileBean.setSonFileCount(0);
-            fileBean.setSize( f.length() );
+            fileBean.setSize(f.length());
             fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
             photos.add(fileBean);
 
@@ -91,13 +107,13 @@ public class FileUtil {
 
     }
 
-    public static int getAllPhotoNumber(Context mContext){
+    public static int getAllPhotoNumber(Context mContext) {
         return getAllPhoto(mContext).size();
     }
 
     private static List<FileBean> getAllMusic(Context mContext) {
 
-        ContentResolver mContentResolver =  mContext.getContentResolver();
+        ContentResolver mContentResolver = mContext.getContentResolver();
         musics.clear();
 
         String[] projection = new String[]{MediaStore.Audio.AudioColumns.DATA};
@@ -105,7 +121,6 @@ public class FileUtil {
 
         Cursor cursor = mContentResolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection,
                 null, null, MediaStore.Audio.AudioColumns.DATE_MODIFIED + " desc");
-
 
 
         while (cursor.moveToNext()) {
@@ -117,11 +132,11 @@ public class FileUtil {
             FileBean fileBean = new FileBean();
             fileBean.setName(f.getName());
             fileBean.setPath(filePath);
-            fileBean.setFileType( FileType.music);
+            fileBean.setFileType(FileType.music);
 //            fileBean.setChildCount(0);int在类中默认初始化值为0
 //            fileBean.setSonFolderCount(0);
 //            fileBean.setSonFileCount(0);
-            fileBean.setSize( f.length() );
+            fileBean.setSize(f.length());
             fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
             musics.add(fileBean);
 
@@ -134,13 +149,13 @@ public class FileUtil {
 
     }
 
-    public static int getAllMusicNumber(Context mContext){
+    public static int getAllMusicNumber(Context mContext) {
         return getAllMusic(mContext).size();
     }
 
     private static List<FileBean> getAllVideo(Context mContext) {
 
-        ContentResolver mContentResolver =  mContext.getContentResolver();
+        ContentResolver mContentResolver = mContext.getContentResolver();
         videos.clear();
 
         String[] projection = new String[]{MediaStore.Video.VideoColumns.DATA};
@@ -159,11 +174,11 @@ public class FileUtil {
             FileBean fileBean = new FileBean();
             fileBean.setName(f.getName());
             fileBean.setPath(filePath);
-            fileBean.setFileType( FileType.video);
+            fileBean.setFileType(FileType.video);
 //            fileBean.setChildCount(0);int在类中默认初始化值为0
 //            fileBean.setSonFolderCount(0);
 //            fileBean.setSonFileCount(0);
-            fileBean.setSize( f.length() );
+            fileBean.setSize(f.length());
             fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
             videos.add(fileBean);
 
@@ -176,13 +191,13 @@ public class FileUtil {
 
     }
 
-    public static int getAllVideoNumber(Context mContext){
+    public static int getAllVideoNumber(Context mContext) {
         return getAllVideo(mContext).size();
     }
 
     private static List<FileBean> getAllText(Context mContext) {
 
-        ContentResolver mContentResolver =  mContext.getContentResolver();
+        ContentResolver mContentResolver = mContext.getContentResolver();
         texts.clear();
 
         String[] projection = new String[]{FileColumns.DATA};
@@ -209,11 +224,11 @@ public class FileUtil {
             FileBean fileBean = new FileBean();
             fileBean.setName(f.getName());
             fileBean.setPath(filePath);
-            fileBean.setFileType(FileUtil.getFileType( f ));
+            fileBean.setFileType(FileUtil.getFileType(f));
 //            fileBean.setChildCount(0);int在类中默认初始化值为0
 //            fileBean.setSonFolderCount(0);
 //            fileBean.setSonFileCount(0);
-            fileBean.setSize( f.length() );
+            fileBean.setSize(f.length());
             fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
             texts.add(fileBean);
 
@@ -228,13 +243,13 @@ public class FileUtil {
 
     }
 
-    public static int getAllTextNumber(Context mContext){
+    public static int getAllTextNumber(Context mContext) {
         return getAllText(mContext).size();
     }
 
     private static List<FileBean> getAllZip(Context mContext) {
 
-        ContentResolver mContentResolver =  mContext.getContentResolver();
+        ContentResolver mContentResolver = mContext.getContentResolver();
         zips.clear();
 
         String[] projection = new String[]{FileColumns.DATA};
@@ -259,7 +274,7 @@ public class FileUtil {
 //            fileBean.setChildCount(0);int在类中默认初始化值为0
 //            fileBean.setSonFolderCount(0);
 //            fileBean.setSonFileCount(0);
-            fileBean.setSize( f.length() );
+            fileBean.setSize(f.length());
             fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
             zips.add(fileBean);
 
@@ -271,13 +286,13 @@ public class FileUtil {
 
     }
 
-    public static int getAllZipNumber(Context mContext){
+    public static int getAllZipNumber(Context mContext) {
         return getAllZip(mContext).size();
     }
 
     private static List<FileBean> getAllApk(Context mContext) {
 
-        ContentResolver mContentResolver =  mContext.getContentResolver();
+        ContentResolver mContentResolver = mContext.getContentResolver();
         apks.clear();
 
         String[] projection = new String[]{FileColumns.DATA};
@@ -303,7 +318,7 @@ public class FileUtil {
 //            fileBean.setChildCount(0);int在类中默认初始化值为0
 //            fileBean.setSonFolderCount(0);
 //            fileBean.setSonFileCount(0);
-            fileBean.setSize( f.length() );
+            fileBean.setSize(f.length());
             fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
             apks.add(fileBean);
 
@@ -314,38 +329,35 @@ public class FileUtil {
 
     }
 
-    public static int getAllApkNumber(Context mContext){
+    public static int getAllApkNumber(Context mContext) {
         return getAllApk(mContext).size();
     }
 
     /*
     传入Context和文件类型，获取文件.https://www.jianshu.com/p/a6bdbefde77a
      */
-    public static Cursor getSpecificTypeOfFile(Context context,String[] extension)
-    {
+    public static Cursor getSpecificTypeOfFile(Context context, String[] extension) {
         //从外存中获取
-        Uri fileUri=Files.getContentUri("external");
+        Uri fileUri = Files.getContentUri("external");
         //筛选列，这里只筛选了：文件路径和不含后缀的文件名
-        String[] projection=new String[]{
-                FileColumns.DATA,FileColumns.TITLE
+        String[] projection = new String[]{
+                FileColumns.DATA, FileColumns.TITLE
         };
         //构造筛选语句
-        String selection="";
-        for(int i=0;i<extension.length;i++)
-        {
-            if(i!=0)
-            {
-                selection=selection+" OR ";
+        String selection = "";
+        for (int i = 0; i < extension.length; i++) {
+            if (i != 0) {
+                selection = selection + " OR ";
             }
-            selection=selection+FileColumns.DATA+" LIKE '%"+extension[i]+"'";
+            selection = selection + FileColumns.DATA + " LIKE '%" + extension[i] + "'";
         }
         //按时间递减顺序对结果进行排序;
-        String sortOrder=FileColumns.DATE_MODIFIED + " desc";
+        String sortOrder = FileColumns.DATE_MODIFIED + " desc";
         //获取内容解析器对象
-        ContentResolver resolver=context.getContentResolver();
+        ContentResolver resolver = context.getContentResolver();
         //获取游标
-        Cursor cursor=resolver.query(fileUri, projection, selection, null, sortOrder);
-        if(cursor == null)
+        Cursor cursor = resolver.query(fileUri, projection, selection, null, sortOrder);
+        if (cursor == null)
             return null;
         else
             return cursor;
@@ -372,10 +384,10 @@ public class FileUtil {
                 fileBean.setName(f.getName());
                 fileBean.setPath(path);
                 fileBean.setFileType(FileUtil.getFileType(f));
-                fileBean.setChildCount( FileUtil.getFileChildCount( f ));//可有可无
+                fileBean.setChildCount(FileUtil.getFileChildCount(f));//可有可无
                 fileBean.setSonFolderCount(FileUtil.getSonFloderCount(f));
                 fileBean.setSonFileCount(FileUtil.getSonFileCount(f));
-                fileBean.setSize( f.length() );
+                fileBean.setSize(f.length());
                 fileBean.setDate(FileUtil.getFileLastModifiedTime(f));
                 fileList.add(fileBean);
             }
@@ -422,7 +434,7 @@ public class FileUtil {
         String[] paths = null;
         //通过调用类的实例mStorageManager的getClass()获取StorageManager类对应的Class对象
         //getMethod("getVolumePaths")返回StorageManager类对应的Class对象的getVolumePaths方法，这里不带参数
-        StorageManager mStorageManager = (StorageManager)context
+        StorageManager mStorageManager = (StorageManager) context
                 .getSystemService(context.STORAGE_SERVICE);//storage
         try {
             mMethodGetPaths = mStorageManager.getClass().getMethod("getVolumePaths");
@@ -486,7 +498,7 @@ public class FileUtil {
      */
     public static String getAvailSpace(Context context, String path) {
         //获取可用内存大小
-        StatFs statfs=new StatFs(path);
+        StatFs statfs = new StatFs(path);
         //获取可用区块的个数
 //        long count=statfs.getAvailableBlocksLong();
 //        //获取每个区块大小
@@ -498,7 +510,7 @@ public class FileUtil {
 
     public static String getAllSpace(Context context, String path) {
         //获取总内存大小,不包含固件大小。
-        StatFs statfs=new StatFs(path);
+        StatFs statfs = new StatFs(path);
 //        //获取总区块的个数
 //        long count=statfs.getBlockCountLong();
 //        //获取每个区块大小
@@ -510,51 +522,52 @@ public class FileUtil {
 
     /**
      * 获取文件类型
+     *
      * @param file
      * @return
      */
-    public static FileType getFileType(File file ){
+    public static FileType getFileType(File file) {
         if (file.isDirectory()) {
-            return FileType.directory ;
+            return FileType.directory;
         }
-        String fileName = file.getName().toLowerCase() ;
+        String fileName = file.getName().toLowerCase();
 
-        if ( fileName.endsWith(".mp3")) {
-            return FileType.music ;
-        }
-
-        if ( fileName.endsWith(".mp4") || fileName.endsWith( ".avi")
-                || fileName.endsWith( ".3gp") || fileName.endsWith( ".mov")
-                || fileName.endsWith( ".rmvb") || fileName.endsWith( ".mkv")
-                || fileName.endsWith( ".flv") || fileName.endsWith( ".rm")) {
-            return FileType.video ;
+        if (fileName.endsWith(".mp3")) {
+            return FileType.music;
         }
 
-        if ( fileName.endsWith(".txt") || fileName.endsWith(".log") || fileName.endsWith(".xml")) {
-            return FileType.txt ;
+        if (fileName.endsWith(".mp4") || fileName.endsWith(".avi")
+                || fileName.endsWith(".3gp") || fileName.endsWith(".mov")
+                || fileName.endsWith(".rmvb") || fileName.endsWith(".mkv")
+                || fileName.endsWith(".flv") || fileName.endsWith(".rm")) {
+            return FileType.video;
         }
 
-        if ( fileName.endsWith(".zip") || fileName.endsWith( ".rar")) {
-            return FileType.zip ;
+        if (fileName.endsWith(".txt") || fileName.endsWith(".log") || fileName.endsWith(".xml")) {
+            return FileType.txt;
         }
 
-        if ( fileName.endsWith(".png") || fileName.endsWith( ".gif")
-                || fileName.endsWith( ".jpeg") || fileName.endsWith( ".jpg")   ) {
-            return FileType.image ;
+        if (fileName.endsWith(".zip") || fileName.endsWith(".rar")) {
+            return FileType.zip;
         }
 
-        if ( fileName.endsWith(".apk") ) {
-            return FileType.apk ;
+        if (fileName.endsWith(".png") || fileName.endsWith(".gif")
+                || fileName.endsWith(".jpeg") || fileName.endsWith(".jpg")) {
+            return FileType.image;
         }
-        if ( fileName.endsWith(".pdf") ) {
-            return FileType.pdf ;
+
+        if (fileName.endsWith(".apk")) {
+            return FileType.apk;
         }
-        if ( fileName.endsWith(".doc") || fileName.endsWith(".docx") ) {
-            return FileType.doc ;
+        if (fileName.endsWith(".pdf")) {
+            return FileType.pdf;
+        }
+        if (fileName.endsWith(".doc") || fileName.endsWith(".docx")) {
+            return FileType.doc;
         }
 
 
-        return FileType.other ;
+        return FileType.other;
     }
 
 
@@ -565,22 +578,22 @@ public class FileUtil {
     }
 
     //自定义文件排序，汉字，_，字母依次
-    private static int compareAB(String left2, String right2){
-        String A = left2.substring(0,1);
-        String B = right2.substring(0,1);
-        if(!isLetter(A) && !isLetter(B)){
+    private static int compareAB(String left2, String right2) {
+        String A = left2.substring(0, 1);
+        String B = right2.substring(0, 1);
+        if (!isLetter(A) && !isLetter(B)) {
             return A.compareTo(B);
-        }else if(!isLetter(A)){
+        } else if (!isLetter(A)) {
             return -1;
-        }else if(!isLetter(B)){
+        } else if (!isLetter(B)) {
             return 1;
-        }else {
+        } else {
             //将字母的按字母排序，不按大小写排序
             String a = A.toLowerCase();
             String b = B.toLowerCase();
-            if(a.compareTo(b) == 0){
+            if (a.compareTo(b) == 0) {
                 return A.compareTo(B);
-            }else {
+            } else {
                 return a.compareTo(b);
             }
         }
@@ -594,58 +607,58 @@ public class FileUtil {
      */
     public static Comparator comparator = new Comparator<File>() {
         @Override
-        public int compare(File file1 , File file2 ) {
-            if ( file1.isDirectory() && file2.isFile() ){
-                return -1 ;
-            }else if ( file1.isFile() && file2.isDirectory() ){
-                return 1 ;
-            }else if(FileUtil.getFileType(file1) != FileUtil.getFileType(file2)){
+        public int compare(File file1, File file2) {
+            if (file1.isDirectory() && file2.isFile()) {
+                return -1;
+            } else if (file1.isFile() && file2.isDirectory()) {
+                return 1;
+            } else if (FileUtil.getFileType(file1) != FileUtil.getFileType(file2)) {
                 //先按类型排序
                 return FileUtil.getFileType(file1).compareTo(FileUtil.getFileType(file2));
-            }else {
+            } else {
                 //再排序同类型的文件或文件夹
-                return compareAB(file1.getName(), file2.getName()) ;
+                return compareAB(file1.getName(), file2.getName());
             }
         }
-    } ;
+    };
 
     //按名称升序
     public static Comparator comparatorNameAsc = new Comparator<FileBean>() {
         @Override
-        public int compare(FileBean fileBean1 , FileBean fileBean2 ) {
-            if ( fileBean1.getFileType()==FileType.directory && fileBean2.getFileType()!=FileType.directory ){
-                return -1 ;
-            }else if (fileBean1.getFileType()!=FileType.directory && fileBean2.getFileType()==FileType.directory ) {
+        public int compare(FileBean fileBean1, FileBean fileBean2) {
+            if (fileBean1.getFileType() == FileType.directory && fileBean2.getFileType() != FileType.directory) {
+                return -1;
+            } else if (fileBean1.getFileType() != FileType.directory && fileBean2.getFileType() == FileType.directory) {
                 return 1;
-            }else {
+            } else {
                 return fileBean1.getName().compareTo(fileBean2.getName());
             }
         }
-    } ;
+    };
 
     //按名称降序
     public static Comparator comparatorNameDesc = new Comparator<FileBean>() {
         @Override
-        public int compare(FileBean fileBean1 , FileBean fileBean2 ) {
-            if ( fileBean1.getFileType()==FileType.directory && fileBean2.getFileType()!=FileType.directory ){
-                return -1 ;
-            }else if (fileBean1.getFileType()!=FileType.directory && fileBean2.getFileType()==FileType.directory ) {
+        public int compare(FileBean fileBean1, FileBean fileBean2) {
+            if (fileBean1.getFileType() == FileType.directory && fileBean2.getFileType() != FileType.directory) {
+                return -1;
+            } else if (fileBean1.getFileType() != FileType.directory && fileBean2.getFileType() == FileType.directory) {
                 return 1;
-            }else {
+            } else {
                 return fileBean2.getName().compareTo(fileBean1.getName());
             }
         }
-    } ;
+    };
 
     //按大小升序
     public static Comparator comparatorSizeAsc = new Comparator<FileBean>() {
         @Override
-        public int compare(FileBean fileBean1 , FileBean fileBean2 ) {
-            if ( fileBean1.getFileType()==FileType.directory && fileBean2.getFileType()!=FileType.directory ){
-                return -1 ;
-            }else if (fileBean1.getFileType()!=FileType.directory && fileBean2.getFileType()==FileType.directory ) {
+        public int compare(FileBean fileBean1, FileBean fileBean2) {
+            if (fileBean1.getFileType() == FileType.directory && fileBean2.getFileType() != FileType.directory) {
+                return -1;
+            } else if (fileBean1.getFileType() != FileType.directory && fileBean2.getFileType() == FileType.directory) {
                 return 1;
-            }else {
+            } else {
                 if (fileBean1.getSize() - fileBean2.getSize() < 0) {
                     return -1;// 小文件在前
                 } else if (fileBean1.getSize() - fileBean2.getSize() > 0) {
@@ -655,17 +668,17 @@ public class FileUtil {
                 }
             }
         }
-    } ;
+    };
 
     //按大小降序
     public static Comparator comparatorSizeDesc = new Comparator<FileBean>() {
         @Override
-        public int compare(FileBean fileBean1 , FileBean fileBean2 ) {
-            if ( fileBean1.getFileType()==FileType.directory && fileBean2.getFileType()!=FileType.directory ){
-                return -1 ;
-            }else if (fileBean1.getFileType()!=FileType.directory && fileBean2.getFileType()==FileType.directory ) {
+        public int compare(FileBean fileBean1, FileBean fileBean2) {
+            if (fileBean1.getFileType() == FileType.directory && fileBean2.getFileType() != FileType.directory) {
+                return -1;
+            } else if (fileBean1.getFileType() != FileType.directory && fileBean2.getFileType() == FileType.directory) {
                 return 1;
-            }else {
+            } else {
                 if (fileBean1.getSize() - fileBean2.getSize() > 0) {
                     return -1;// 大文件在前
                 } else if (fileBean1.getSize() - fileBean2.getSize() < 0) {
@@ -675,49 +688,49 @@ public class FileUtil {
                 }
             }
         }
-    } ;
+    };
 
     //按类型升序
     public static Comparator comparatorTypeAsc = new Comparator<FileBean>() {
         @Override
-        public int compare(FileBean fileBean1 , FileBean fileBean2 ) {
-            if ( fileBean1.getFileType()==FileType.directory && fileBean2.getFileType()!=FileType.directory ){
-                return -1 ;
-            }else if (fileBean1.getFileType()!=FileType.directory && fileBean2.getFileType()==FileType.directory ) {
+        public int compare(FileBean fileBean1, FileBean fileBean2) {
+            if (fileBean1.getFileType() == FileType.directory && fileBean2.getFileType() != FileType.directory) {
+                return -1;
+            } else if (fileBean1.getFileType() != FileType.directory && fileBean2.getFileType() == FileType.directory) {
                 return 1;
-            }else if (fileBean1.getFileType() == fileBean2.getFileType()) {
+            } else if (fileBean1.getFileType() == fileBean2.getFileType()) {
                 return 0;
             } else {
                 return fileBean1.getFileType().compareTo(fileBean2.getFileType());
             }
         }
-    } ;
+    };
 
     //按类型降序
     public static Comparator comparatorTypeDesc = new Comparator<FileBean>() {
         @Override
-        public int compare(FileBean fileBean1 , FileBean fileBean2 ) {
-            if ( fileBean1.getFileType()==FileType.directory && fileBean2.getFileType()!=FileType.directory ){
-                return -1 ;
-            }else if (fileBean1.getFileType()!=FileType.directory && fileBean2.getFileType()==FileType.directory ) {
+        public int compare(FileBean fileBean1, FileBean fileBean2) {
+            if (fileBean1.getFileType() == FileType.directory && fileBean2.getFileType() != FileType.directory) {
+                return -1;
+            } else if (fileBean1.getFileType() != FileType.directory && fileBean2.getFileType() == FileType.directory) {
                 return 1;
-            }else if (fileBean1.getFileType() == fileBean2.getFileType()) {
+            } else if (fileBean1.getFileType() == fileBean2.getFileType()) {
                 return 0;
             } else {
                 return fileBean1.getFileType().compareTo(fileBean2.getFileType());
             }
         }
-    } ;
+    };
 
     //按时间升序
     public static Comparator comparatorDateAsc = new Comparator<FileBean>() {
         @Override
-        public int compare(FileBean fileBean1 , FileBean fileBean2 ) {
-            if ( fileBean1.getFileType()==FileType.directory && fileBean2.getFileType()!=FileType.directory ){
-                return -1 ;
-            }else if (fileBean1.getFileType()!=FileType.directory && fileBean2.getFileType()==FileType.directory ) {
+        public int compare(FileBean fileBean1, FileBean fileBean2) {
+            if (fileBean1.getFileType() == FileType.directory && fileBean2.getFileType() != FileType.directory) {
+                return -1;
+            } else if (fileBean1.getFileType() != FileType.directory && fileBean2.getFileType() == FileType.directory) {
                 return 1;
-            }else {
+            } else {
                 File file1 = new File(fileBean1.getPath());
                 File file2 = new File(fileBean2.getPath());
                 if (file1.lastModified() < file2.lastModified()) {
@@ -729,17 +742,17 @@ public class FileUtil {
                 }
             }
         }
-    } ;
+    };
 
     //按时间降序
     public static Comparator comparatorDateDesc = new Comparator<FileBean>() {
         @Override
-        public int compare(FileBean fileBean1 , FileBean fileBean2 ) {
-            if ( fileBean1.getFileType()==FileType.directory && fileBean2.getFileType()!=FileType.directory ){
-                return -1 ;
-            }else if (fileBean1.getFileType()!=FileType.directory && fileBean2.getFileType()==FileType.directory ) {
+        public int compare(FileBean fileBean1, FileBean fileBean2) {
+            if (fileBean1.getFileType() == FileType.directory && fileBean2.getFileType() != FileType.directory) {
+                return -1;
+            } else if (fileBean1.getFileType() != FileType.directory && fileBean2.getFileType() == FileType.directory) {
                 return 1;
-            }else {
+            } else {
 //                try {
                 File file1 = new File(fileBean1.getPath());
                 File file2 = new File(fileBean2.getPath());
@@ -758,10 +771,11 @@ public class FileUtil {
 //                }
             }
         }
-    } ;
+    };
 
     /**
      * 获取文件的子文件个数
+     *
      * @param file
      * @return
      */
@@ -771,7 +785,7 @@ public class FileUtil {
             File[] files = file.listFiles();
             for (File f : files) {
                 if (f.isHidden()) continue;
-                count ++ ;
+                count++;
             }
         }
         return count;
@@ -779,6 +793,7 @@ public class FileUtil {
 
     /**
      * 获取文件的子文件个数
+     *
      * @param file
      * @return
      */
@@ -788,8 +803,8 @@ public class FileUtil {
             File[] files = file.listFiles();
             for (File f : files) {
                 if (f.isHidden()) continue;
-                if(!f.isDirectory()){
-                    count ++ ;
+                if (!f.isDirectory()) {
+                    count++;
                 }
             }
         }
@@ -798,6 +813,7 @@ public class FileUtil {
 
     /**
      * 获取文件的子文件夹个数
+     *
      * @param file
      * @return
      */
@@ -807,8 +823,8 @@ public class FileUtil {
             File[] files = file.listFiles();
             for (File f : files) {
                 if (f.isHidden()) continue;
-                if(f.isDirectory()){
-                    count ++ ;
+                if (f.isDirectory()) {
+                    count++;
                 }
             }
         }
@@ -818,28 +834,29 @@ public class FileUtil {
 
     /**
      * 文件大小转换
+     *
      * @param size
      * @return
      */
-    public static String sizeToChange( long size ){
-        java.text.DecimalFormat df   =new   java.text.DecimalFormat("#.00");  //字符格式化，为保留小数做准备
+    public static String sizeToChange(long size) {
+        java.text.DecimalFormat df = new java.text.DecimalFormat("#.00");  //字符格式化，为保留小数做准备
 
-        double G = size * 1.0 / 1024 / 1024 /1024 ;
-        if ( G >= 1 ){
-            return df.format( G ) + " GB";
+        double G = size * 1.0 / 1024 / 1024 / 1024;
+        if (G >= 1) {
+            return df.format(G) + " GB";
         }
 
-        double M = size * 1.0 / 1024 / 1024  ;
-        if ( M >= 1 ){
-            return df.format( M ) + " MB";
+        double M = size * 1.0 / 1024 / 1024;
+        if (M >= 1) {
+            return df.format(M) + " MB";
         }
 
-        double K = size  * 1.0 / 1024   ;
-        if ( K >= 1 ){
-            return df.format( K ) + " KB";
+        double K = size * 1.0 / 1024;
+        if (K >= 1) {
+            return df.format(K) + " KB";
         }
 
-        return size + " B" ;
+        return size + " B";
     }
 
    /*
@@ -854,19 +871,21 @@ public class FileUtil {
     并且这个intent的目标activity就是栈顶的activity，那么将不会新建一个实例压入栈中。简而言之，
     目标activity已在栈顶则跳转过去，不在栈顶则在栈顶新建activity。
     */
+
     /**
      * 安装apk
+     *
      * @param context
      * @param file
      */
-    public static void openAppIntent(Context context , File file ){
+    public static void openAppIntent(Context context, File file) {
         Intent intent = new Intent(Intent.ACTION_VIEW);//显示数据的通用intent
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Uri uri = FileProvider.getUriForFile(context,
                     context.getApplicationContext().getPackageName() + ".provider", file);
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.setDataAndType(uri, "application/vnd.android.package-archive");
-        }else {
+        } else {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
         }
@@ -875,10 +894,11 @@ public class FileUtil {
 
     /**
      * 打开图片资源
+     *
      * @param context
      * @param file
      */
-    public static void openImageIntent( Context context , File file ) {
+    public static void openImageIntent(Context context, File file) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addCategory("android.intent.category.DEFAULT");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -888,7 +908,7 @@ public class FileUtil {
 //            Log.e(context.getPackageName(), "openImageIntent111: 222" );
 
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        }else {
+        } else {
 //            Log.e(context.getPackageName(), "openImageIntent111: 111" );
             intent.setDataAndType(Uri.fromFile(file), "image/*");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -898,10 +918,11 @@ public class FileUtil {
 
     /**
      * 打开PDF资源
+     *
      * @param context
      * @param file
      */
-    public static void openPDFIntent( Context context , File file ) {
+    public static void openPDFIntent(Context context, File file) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addCategory("android.intent.category.DEFAULT");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -909,7 +930,7 @@ public class FileUtil {
                     context.getApplicationContext().getPackageName() + ".provider", file);
             intent.setDataAndType(uri, "application/pdf");
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        }else {
+        } else {
             intent.setDataAndType(Uri.fromFile(file), "application/pdf");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
@@ -918,10 +939,11 @@ public class FileUtil {
 
     /**
      * 打开doc资源
+     *
      * @param context
      * @param file
      */
-    public static void openDocIntent( Context context , File file ) {
+    public static void openDocIntent(Context context, File file) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addCategory("android.intent.category.DEFAULT");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -929,7 +951,7 @@ public class FileUtil {
                     context.getApplicationContext().getPackageName() + ".provider", file);
             intent.setDataAndType(uri, "application/msword");
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        }else {
+        } else {
             intent.setDataAndType(Uri.fromFile(file), "application/msword");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
@@ -939,10 +961,11 @@ public class FileUtil {
 
     /**
      * 打开文本资源
+     *
      * @param context
      * @param file
      */
-    public static void openTextIntent( Context context , File file ) {
+    public static void openTextIntent(Context context, File file) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addCategory("android.intent.category.DEFAULT");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -950,7 +973,7 @@ public class FileUtil {
                     context.getApplicationContext().getPackageName() + ".provider", file);
             intent.setDataAndType(uri, "text/*");
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        }else {
+        } else {
             intent.setDataAndType(Uri.fromFile(file), "text/*");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
@@ -959,10 +982,11 @@ public class FileUtil {
 
     /**
      * 打开音频资源
+     *
      * @param context
      * @param file
      */
-    public static void openMusicIntent( Context context , File file ){
+    public static void openMusicIntent(Context context, File file) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addCategory("android.intent.category.DEFAULT");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -970,7 +994,7 @@ public class FileUtil {
                     context.getApplicationContext().getPackageName() + ".provider", file);
             intent.setDataAndType(uri, "audio/*");
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        }else {
+        } else {
             intent.setDataAndType(Uri.fromFile(file), "audio/*");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
@@ -979,10 +1003,11 @@ public class FileUtil {
 
     /**
      * 打开视频资源
+     *
      * @param context
      * @param file
      */
-    public static void openVideoIntent( Context context , File file ){
+    public static void openVideoIntent(Context context, File file) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addCategory("android.intent.category.DEFAULT");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -990,7 +1015,7 @@ public class FileUtil {
                     context.getApplicationContext().getPackageName() + ".provider", file);
             intent.setDataAndType(uri, "video/*");
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        }else {
+        } else {
             intent.setDataAndType(Uri.fromFile(file), "video/*");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
@@ -1000,10 +1025,11 @@ public class FileUtil {
 
     /**
      * 打开所有能打开应用资源
+     *
      * @param context
      * @param file
      */
-    public static void openApplicationIntent( Context context , File file ){
+    public static void openApplicationIntent(Context context, File file) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addCategory("android.intent.category.DEFAULT");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -1011,7 +1037,7 @@ public class FileUtil {
                     context.getApplicationContext().getPackageName() + ".provider", file);
             intent.setDataAndType(uri, "application/*");
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        }else {
+        } else {
             intent.setDataAndType(Uri.fromFile(file), "application/*");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
@@ -1021,10 +1047,11 @@ public class FileUtil {
 
     /**
      * 发送文件给第三方app
+     *
      * @param context
      * @param file
      */
-    public static void sendFile( Context context , File file ){
+    public static void sendFile(Context context, File file) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.addCategory("android.intent.category.DEFAULT");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -1033,7 +1060,7 @@ public class FileUtil {
             intent.putExtra(Intent.EXTRA_STREAM, uri);
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.setType("*/*");//此处可发送多种文件
-        }else {
+        } else {
             intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setType("*/*");//此处可发送多种文件
@@ -1064,5 +1091,44 @@ public class FileUtil {
     public static List<FileBean> getApks() {
         return apks;
     }
+
+    public static String getFileMD5(File file) {
+        if (!file.isFile()) {
+            return null;
+        }
+        MessageDigest digest = null;
+        FileInputStream in = null;
+        byte buffer[] = new byte[1024];
+        int len;
+        try {
+            digest = MessageDigest.getInstance("MD5");
+            in = new FileInputStream(file);
+            while ((len = in.read(buffer, 0, 1024)) != -1) {
+                digest.update(buffer, 0, len);
+            }
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return bytesToHexString(digest.digest());
+    }
+
+    private static String bytesToHexString(byte[] src) {
+        StringBuilder stringBuilder = new StringBuilder("");
+        if (src == null || src.length <= 0) {
+            return null;
+        }
+        for (int i = 0; i < src.length; i++) {
+            int v = src[i] & 0xFF;
+            String hv = Integer.toHexString(v);
+            if (hv.length() < 2) {
+                stringBuilder.append(0);
+            }
+            stringBuilder.append(hv);
+        }
+        return stringBuilder.toString();
+    }
+
 
 }

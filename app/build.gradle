@@ -36,5 +36,6 @@ dependencies {
     compile 'com.github.hotchemi:permissionsdispatcher:2.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
     compile 'com.github.jianhaojiang:GestureLock:1.0.0'
+    compile 'org.litepal.android:core:1.6.1'
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.3.2'
 }

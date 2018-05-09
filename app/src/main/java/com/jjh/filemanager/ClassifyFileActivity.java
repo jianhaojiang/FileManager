@@ -2,6 +2,7 @@ package com.jjh.filemanager;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -44,6 +46,7 @@ public class ClassifyFileActivity extends AppCompatActivity {
     private RelativeLayout bodyLayout;
     private LinearLayout activityClassify_bottom;
     private List<FileBean> beanList = new ArrayList<>();
+    private List<FileBean> privateList = new ArrayList<>();
     private LinearLayout empty_rel ;
     private int Type;
     private ProgressBar progressBar;
@@ -70,6 +73,7 @@ public class ClassifyFileActivity extends AppCompatActivity {
         initView();
         //根据点击路径浏览文件
         browsePath();
+        SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
     }
 
 
@@ -145,18 +149,159 @@ public class ClassifyFileActivity extends AppCompatActivity {
 
     }
 
+    public void browsePath(){
+        //根据点击的不同存储地址显示文件列表
+        Type = getIntent().getIntExtra("Type",0);
+        switch (Type){
+            case 0:
+                Log.e(TAG, "ERROR" );
+                Toast.makeText(this, "抱歉，程序异常请重试或重启！", Toast.LENGTH_LONG).show();
+                finish();
+                break;
+            case TYPE_MUSIC:
+                title.setText("音乐");
+                beanList = FileUtil.getMusics();
+                break;
+            case TYPE_IMAGE:
+                title.setText("图片");
+                beanList = FileUtil.getPhotos();
+                break;
+            case TYPE_TXT:
+                title.setText("文档");
+                beanList = FileUtil.getTexts();
+                break;
+            case TYPE_VIDEO:
+                title.setText("视频");
+                beanList = FileUtil.getVideos();
+                break;
+            case TYPE_APK:
+                title.setText("安装包");
+                beanList = FileUtil.getApks();
+                break;
+            case TYPE_ZIP:
+                title.setText("压缩包");
+                beanList = FileUtil.getZips();
+                break;
+            case SEARCH_FILE:
+                title.setText("搜索结果");
+                new SearchFile().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , "") ;
+                break;
+            case PRIVATE_FILE:
+                title.setText("私人目录");
+                beanList = new ArrayList<FileBean>(privateList);
+                break;
+            default:
+
+        }
+        //不是搜索文件跳转过来的页面时
+        if(Type != SEARCH_FILE){
+            if(progressBar.getVisibility() == View.VISIBLE){
+                progressBar.setVisibility(View.GONE);
+                bodyLayout.setVisibility(View.VISIBLE);
+                activityClassify_bottom.setVisibility(View.VISIBLE);
+            }
+            if (beanList.isEmpty()){
+                empty_rel.setVisibility(View.VISIBLE);
+            }else {
+                empty_rel.setVisibility(View.GONE);
+            }
+            fileAdapter.refresh(beanList);
+        }
+
+    }
+
+    //删除文件方法
+    private boolean deleteFile(FileBean fileBean){
+        try {
+            String path = fileBean.getPath();
+            new File(path).delete();//因为文件信息是数据库读取的，实际删除文件后还需要去更新数据库
+            FileUtil.updateExternalDB(fileBean.getPath(), ClassifyFileActivity.this);
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    //解密方法
+    private boolean decipheringFile(FileBean fileBean){
+        try {
+            String privateName = fileBean.getPrivateName();
+            String path = fileBean.getPath();
+            String privatePath = fileBean.getPrivatePath();
+            new File(privatePath).renameTo(new File(path));
+            //因为文件信息是数据库读取的，实际删除文件后还需要去更新数据库
+            FileUtil.updateExternalDB(fileBean.getPrivatePath(), ClassifyFileActivity.this);
+            FileUtil.updateExternalDB(fileBean.getPath(), ClassifyFileActivity.this);
+            beanList.remove(fileBean);
+            privateList.remove(fileBean);
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    //加密方法
+    private boolean encryptionFile(FileBean fileBean){
+        try {
+            String privateName = FileUtil.getFileMD5(new File(fileBean.getPath()));
+            String path = fileBean.getPath();
+            String privatePath = path.substring(0,path.lastIndexOf(File.separator)+1) + "." +  privateName;
+            new File(path).renameTo(new File(privatePath));
+            beanList.remove(fileBean);
+            fileBean.setPrivateName(privateName);
+            fileBean.setPrivatePath(privatePath);
+            privateList.add(fileBean);
+            //因为文件信息是数据库读取的，实际删除文件后还需要去更新数据库
+            FileUtil.updateExternalDB(fileBean.getPath(), ClassifyFileActivity.this);
+            FileUtil.updateExternalDB(fileBean.getPrivatePath(), ClassifyFileActivity.this);
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         getMenuInflater().inflate(R.menu.context_menu, menu);
+        if(Type == PRIVATE_FILE) {
+            menu.findItem(R.id.menu_deciphering).setVisible(true);
+        }
+    }
+
+
+
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+
+        return super.onMenuOpened(featureId, menu);
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.menu_encryption) {
-            Toast.makeText(this, "加密被选择了", Toast.LENGTH_SHORT).show();
+//            Log.e(TAG, "onContextItemSelected: " + new File(longClickFileBean.getPath()).getPath() );
+            Boolean state = encryptionFile(longClickFileBean);
+            if(state){
+                Toast.makeText(this, "加密成功！", Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(this, "加密失败了！", Toast.LENGTH_SHORT).show();
+            }
+            fileAdapter.refresh(beanList);
+
+        }else if (item.getItemId() == R.id.menu_deciphering) {
+            Boolean state = decipheringFile(longClickFileBean);
+            if(state){
+                Toast.makeText(this, "已解密到原路径！", Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(this, "解密失败了！", Toast.LENGTH_SHORT).show();
+            }
+            fileAdapter.refresh(beanList);
         } else if (item.getItemId() == R.id.menu_attribute) {
             showAttributeDialog();
 //            Toast.makeText(this, "属性被选择了", Toast.LENGTH_SHORT).show();
@@ -341,65 +486,6 @@ public class ClassifyFileActivity extends AppCompatActivity {
         singleChoiceDialog.show();
     }
 
-    public void browsePath(){
-        //根据点击的不同存储地址显示文件列表
-        Type = getIntent().getIntExtra("Type",0);
-        switch (Type){
-            case 0:
-                Log.e(TAG, "ERROR" );
-                Toast.makeText(this, "抱歉，程序异常请重试或重启！", Toast.LENGTH_LONG).show();
-                finish();
-                break;
-            case TYPE_MUSIC:
-                title.setText("音乐");
-                beanList = FileUtil.getMusics();
-                break;
-            case TYPE_IMAGE:
-                title.setText("图片");
-                beanList = FileUtil.getPhotos();
-                break;
-            case TYPE_TXT:
-                title.setText("文档");
-                beanList = FileUtil.getTexts();
-                break;
-            case TYPE_VIDEO:
-                title.setText("视频");
-                beanList = FileUtil.getVideos();
-                break;
-            case TYPE_APK:
-                title.setText("安装包");
-                beanList = FileUtil.getApks();
-                break;
-            case TYPE_ZIP:
-                title.setText("压缩包");
-                beanList = FileUtil.getZips();
-                break;
-            case SEARCH_FILE:
-                title.setText("搜索结果");
-                new SearchFile().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , "") ;
-                break;
-            case PRIVATE_FILE:
-                title.setText("私人目录");
-                break;
-            default:
-
-        }
-        //不是搜索文件跳转过来的页面时
-        if(Type != SEARCH_FILE){
-            if(progressBar.getVisibility() == View.VISIBLE){
-                progressBar.setVisibility(View.GONE);
-                bodyLayout.setVisibility(View.VISIBLE);
-                activityClassify_bottom.setVisibility(View.VISIBLE);
-            }
-            if (beanList.isEmpty()){
-                empty_rel.setVisibility(View.VISIBLE);
-            }else {
-                empty_rel.setVisibility(View.GONE);
-            }
-            fileAdapter.refresh(beanList);
-        }
-
-    }
 
     class SearchFile extends AsyncTask {
         @Override

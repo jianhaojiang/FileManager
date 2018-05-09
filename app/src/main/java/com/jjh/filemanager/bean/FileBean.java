@@ -5,15 +5,32 @@ package com.jjh.filemanager.bean;
  */
 
 public class FileBean {
-
     private String name;
     private String path;
+    private String privateName = null;
+    private String privatePath = null;
     private FileType fileType = FileType.other;
     private int sonFileCount;
     private int sonFolderCount;
     private int childCount ;
     private long size ;
     private String date;
+
+    public String getPrivateName() {
+        return privateName;
+    }
+
+    public void setPrivateName(String privateName) {
+        this.privateName = privateName;
+    }
+
+    public String getPrivatePath() {
+        return privatePath;
+    }
+
+    public void setPrivatePath(String privatePath) {
+        this.privatePath = privatePath;
+    }
 
     public String getDate() {
         return date;
