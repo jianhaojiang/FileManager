@@ -792,7 +792,7 @@ public class FileUtil {
             } else if (fileBean1.getFileType() == fileBean2.getFileType()) {
                 return 0;
             } else {
-                return fileBean1.getFileType().compareTo(fileBean2.getFileType());
+                return fileBean2.getFileType().compareTo(fileBean1.getFileType());
             }
         }
     };
@@ -806,13 +806,19 @@ public class FileUtil {
             } else if (fileBean1.getFileType() != FileType.directory && fileBean2.getFileType() == FileType.directory) {
                 return 1;
             } else {
-                File file1 = new File(fileBean1.getPath());
-                File file2 = new File(fileBean2.getPath());
-                if (file1.lastModified() < file2.lastModified()) {
-                    return -1;// 最后修改的文件在后
-                } else if (file1.lastModified() > file2.lastModified()) {
-                    return 1;
-                } else {
+                try {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Long time1 = dateFormat.parse(fileBean1.getDate()).getTime();
+                    Long time2 = dateFormat.parse(fileBean2.getDate()).getTime();
+                    if (time1 < time2) {
+                        return -1;// 最后修改的文件在后
+                    } else if (time1 > time2) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                     return 0;
                 }
             }
@@ -828,22 +834,21 @@ public class FileUtil {
             } else if (fileBean1.getFileType() != FileType.directory && fileBean2.getFileType() == FileType.directory) {
                 return 1;
             } else {
-//                try {
-                File file1 = new File(fileBean1.getPath());
-                File file2 = new File(fileBean2.getPath());
-                if (file1.lastModified() > file2.lastModified()) {
-                    return -1;// 最后修改的文件在前
-                } else if (file1.lastModified() < file2.lastModified()) {
-                    return 1;
-                } else {
+                try {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Long time1 = dateFormat.parse(fileBean1.getDate()).getTime();
+                    Long time2 = dateFormat.parse(fileBean2.getDate()).getTime();
+                    if (time1 > time2) {
+                        return -1;// 最后修改的文件在前
+                    } else if (time1 < time2) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                     return 0;
                 }
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                    return 0;
-//                } finally {
-//
-//                }
             }
         }
     };
