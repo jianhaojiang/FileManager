@@ -49,6 +49,8 @@ public class ClassifyFileActivity extends AppCompatActivity {
     private RelativeLayout bodyLayout;
     private LinearLayout activityClassify_bottom;
     private List<FileBean> beanList = new ArrayList<>();
+    //originalList的作用是保留一开始创建活动展示的列表
+    private List<FileBean> originalList = new ArrayList<>();
     private LinearLayout empty_rel ;
     private int Type;
     private ProgressBar progressBar;
@@ -247,6 +249,8 @@ public class ClassifyFileActivity extends AppCompatActivity {
             }else {
                 empty_rel.setVisibility(View.GONE);
             }
+            //originalList的作用是保留一开始创建活动展示的列表
+            originalList = beanList;
             fileAdapter.refresh(beanList);
         }
 
@@ -355,7 +359,7 @@ public class ClassifyFileActivity extends AppCompatActivity {
     private List<FileBean> getPrivateFiles(){
         List<FileBean> list = new ArrayList<>();
         List<EncryptedItem> encryptedItems = DataSupport.findAll(EncryptedItem.class);
-        Log.e(TAG, "getPrivateFiles: " + encryptedItems.size() );
+//        Log.e(TAG, "getPrivateFiles: " + encryptedItems.size() );
         String oldName;
         String privateName;
         String oldPath;
@@ -620,6 +624,8 @@ public class ClassifyFileActivity extends AppCompatActivity {
             }else {
                 empty_rel.setVisibility(View.GONE);
             }
+            //originalList的作用是保留一开始创建活动展示的列表
+            originalList = beanList;
             fileAdapter.refresh(beanList);
         }
     }
@@ -629,12 +635,17 @@ public class ClassifyFileActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK
                 && event.getRepeatCount() == 0) {
-            if(Type == PRIVATE_FILE){
+            if(!originalList.isEmpty() && originalList != beanList){
+                beanList = originalList;
+                fileAdapter.refresh(beanList);
+                return true;
+            }else if(Type == PRIVATE_FILE){
                 Intent privateIntent = new Intent(ClassifyFileActivity.this, MainActivity.class);
                 startActivity(privateIntent);
                 finish();
                 return true;
             }
+
         }
         return super.onKeyDown(keyCode, event);
     }

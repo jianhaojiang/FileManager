@@ -72,6 +72,8 @@ public class MainActivity extends FragmentActivity{
         else {
             initView();
         }
+//        //清除所有Glide缓存的图片
+//        GlideCacheUtil.getInstance().clearImageAllCache(MainActivity.this);
 }
 
     public void initView(){

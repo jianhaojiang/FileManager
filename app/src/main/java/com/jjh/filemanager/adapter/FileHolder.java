@@ -1,7 +1,11 @@
 package com.jjh.filemanager.adapter;
+import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.jjh.filemanager.FileUtil;
 import com.jjh.filemanager.R;
@@ -70,7 +74,7 @@ public class FileHolder extends RecyclerViewHolder<FileHolder> {
         } else if (fileType == FileType.zip) {
             fileHolder.fileIcon.setImageResource(R.mipmap.file_icon_zip);
         } else if (fileType == FileType.image) {
-            Glide.with(fileHolder.itemView.getContext()).load(new File(fileBean.getPath())).into(fileHolder.fileIcon);
+            Glide.with(fileHolder.itemView.getContext()).load(new File(fileBean.getPath())).error(R.mipmap.file_icon_other).into(fileHolder.fileIcon);
         } else if (fileType == FileType.apk) {
             fileHolder.fileIcon.setImageResource(R.mipmap.file_icon_apk);
         } else if (fileType == FileType.doc) {
