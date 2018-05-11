@@ -25,6 +25,8 @@ import com.jjh.filemanager.fragment.adapter.FragAdapter;
 import com.jjh.filemanager.fragment.classifyFileFragment;
 import com.jjh.filemanager.fragment.localFileFragment;
 
+import org.litepal.tablemanager.Connector;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,6 +59,9 @@ public class MainActivity extends FragmentActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //首次启动创建我的数据库，用于加密的时候使用
+        Connector.getDatabase();
 
         //两个权限为同一个危险权限组，只需要判断其中一个权限，整组权限都可以通过
         if(ContextCompat.checkSelfPermission(MainActivity.this,

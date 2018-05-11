@@ -14,6 +14,8 @@ import com.jjh.filemanager.bean.FileType;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -478,6 +480,39 @@ public class FileUtil {
         return null;
     }
 
+    /**
+     * 复制单个文件
+     * @param oldPath String 原文件路径 如：c:/fqf.txt
+     * @param newPath String 复制后路径 如：f:/fqf.txt
+     * @return boolean
+     */
+    public static Boolean copyFile(String oldPath, String newPath) {
+        Boolean state = false;
+        try {
+            int bytesum = 0;
+            int byteread = 0;
+            File oldfile = new File(oldPath);
+            if (oldfile.exists()) { //文件存在时
+                InputStream inStream = new FileInputStream(oldPath); //读入原文件
+                FileOutputStream fs = new FileOutputStream(newPath);
+                byte[] buffer = new byte[1444];
+                int length;
+                while ( (byteread = inStream.read(buffer)) != -1) {
+                    bytesum += byteread; //字节数 文件大小
+                    System.out.println(bytesum);
+                    fs.write(buffer, 0, byteread);
+                }
+                inStream.close();
+                state = true;
+            }
+
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return state;
+    }
+
 
     /*
     getAvailableBlocksLong()
@@ -570,6 +605,46 @@ public class FileUtil {
         return FileType.other;
     }
 
+    public static FileType getFileNameType(String fileName) {
+        fileName = fileName.toLowerCase();
+
+        if (fileName.endsWith(".mp3")) {
+            return FileType.music;
+        }
+
+        if (fileName.endsWith(".mp4") || fileName.endsWith(".avi")
+                || fileName.endsWith(".3gp") || fileName.endsWith(".mov")
+                || fileName.endsWith(".rmvb") || fileName.endsWith(".mkv")
+                || fileName.endsWith(".flv") || fileName.endsWith(".rm")) {
+            return FileType.video;
+        }
+
+        if (fileName.endsWith(".txt") || fileName.endsWith(".log") || fileName.endsWith(".xml")) {
+            return FileType.txt;
+        }
+
+        if (fileName.endsWith(".zip") || fileName.endsWith(".rar")) {
+            return FileType.zip;
+        }
+
+        if (fileName.endsWith(".png") || fileName.endsWith(".gif")
+                || fileName.endsWith(".jpeg") || fileName.endsWith(".jpg")) {
+            return FileType.image;
+        }
+
+        if (fileName.endsWith(".apk")) {
+            return FileType.apk;
+        }
+        if (fileName.endsWith(".pdf")) {
+            return FileType.pdf;
+        }
+        if (fileName.endsWith(".doc") || fileName.endsWith(".docx")) {
+            return FileType.doc;
+        }
+
+
+        return FileType.other;
+    }
 
     private static boolean isLetter(String str) {
         String regex = "^[a-zA-Z]+$";//其他需要，直接修改正则表达式就好.判断为单词
@@ -1090,6 +1165,18 @@ public class FileUtil {
 
     public static List<FileBean> getApks() {
         return apks;
+    }
+
+    public static String getFileNameMD5(String fileName) {
+        MessageDigest digest = null;
+        try {
+            digest = MessageDigest.getInstance("MD5");
+            digest.update(fileName.getBytes());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return bytesToHexString(digest.digest());
     }
 
     public static String getFileMD5(File file) {

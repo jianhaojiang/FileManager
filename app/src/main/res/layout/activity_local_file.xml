@@ -50,7 +50,7 @@
         android:layout_alignParentBottom="true"
         >
 
-        <include layout="@layout/activity_bottom1"
+        <include layout="@layout/activity_bottom"
             android:id="@+id/sss"></include>
 
     </LinearLayout>

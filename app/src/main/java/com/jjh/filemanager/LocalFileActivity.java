@@ -23,9 +23,13 @@ import com.jjh.filemanager.adapter.FileHolder;
 import com.jjh.filemanager.adapter.FileAdapter;
 import com.jjh.filemanager.adapter.TitleAdapter;
 import com.jjh.filemanager.adapter.base.RecyclerViewAdapter;
+import com.jjh.filemanager.bean.EncryptedItem;
 import com.jjh.filemanager.bean.FileBean;
 import com.jjh.filemanager.bean.TitlePath;
 import com.jjh.filemanager.bean.FileType;
+
+import org.litepal.crud.DataSupport;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -353,9 +357,18 @@ public class LocalFileActivity extends AppCompatActivity {
     public boolean onContextItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.menu_encryption) {
-            Toast.makeText(this, "加密被选择了", Toast.LENGTH_SHORT).show();
+//            Log.e(TAG, "onContextItemSelected: " + new File(longClickFileBean.getPath()).getPath() );
+            Boolean state = encryptionFile(longClickFileBean);
+            if(state){
+                Toast.makeText(this, "加密成功！", Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(this, "加密失败了！", Toast.LENGTH_SHORT).show();
+            }
+            fileAdapter.refresh(beanList);
+
         } else if (item.getItemId() == R.id.menu_attribute) {
             showAttributeDialog();
+//            Toast.makeText(this, "属性被选择了", Toast.LENGTH_SHORT).show();
         }else if (item.getItemId() == R.id.menu_share) {
             FileUtil.sendFile( LocalFileActivity.this , new File( longClickFileBean.getPath() ) );
         }
@@ -467,6 +480,60 @@ public class LocalFileActivity extends AppCompatActivity {
             }
         }
     }
+
+    //解密方法
+    private boolean decipheringFile(FileBean fileBean){
+        boolean decipheringState;
+        try {
+            String oldPath = fileBean.getPath();
+            String privatePath =fileBean.getPrivatePath();
+            new File(privatePath).renameTo(new File(oldPath));
+            beanList.remove(fileBean);
+            //对应删除数据库存放的记录
+            DataSupport.deleteAll(EncryptedItem.class, "oldPath = ? and privatePath = ?"
+                    , oldPath, privatePath);
+            //因为文件信息是external.db数据库读取的，实际更改文件后还需要去更新数据库
+            FileUtil.updateExternalDB(oldPath, LocalFileActivity.this);
+            FileUtil.updateExternalDB(privatePath, LocalFileActivity.this);
+            decipheringState = true;
+        }catch (Exception e){
+            e.printStackTrace();
+            decipheringState = false;
+        }
+        return decipheringState;
+    }
+
+    //加密方法
+    private boolean encryptionFile(FileBean fileBean){
+        boolean encryptionState;
+        try {
+            String oldName = fileBean.getName();
+            String privateName = "." + FileUtil.getFileNameMD5(oldName);
+            String oldPath = fileBean.getPath();
+            String privatePath = oldPath.substring(0,oldPath.lastIndexOf(File.separator)+1) + privateName;
+            //将加密信息放进sqlite数据库
+            EncryptedItem encryptedItem = new EncryptedItem();
+            encryptedItem.setOldName(oldName);
+            encryptedItem.setPrivateName(privateName);
+            encryptedItem.setOldPath(oldPath);
+            encryptedItem.setPrivatePath(privatePath);
+            encryptionState = encryptedItem.save();
+            if(encryptionState){
+                new File(oldPath).renameTo(new File(privatePath));
+                beanList.remove(fileBean);
+//                Log.e(TAG, "getPrivateFiles: 存入数据库成功啦！" + oldName);
+                //因为文件信息是external.db数据库读取的，实际删除文件后还需要去更新数据库
+                FileUtil.updateExternalDB(oldPath, LocalFileActivity.this);
+                FileUtil.updateExternalDB(privatePath, LocalFileActivity.this);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            encryptionState = false;
+        }
+        return encryptionState;
+    }
+
+
 
     void refreshTitleState( String title , String path ){
         TitlePath filePath = new TitlePath() ;

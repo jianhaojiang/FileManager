@@ -25,10 +25,13 @@ import android.widget.Toast;
 import com.jjh.filemanager.adapter.FileAdapter;
 import com.jjh.filemanager.adapter.FileHolder;
 import com.jjh.filemanager.adapter.base.RecyclerViewAdapter;
+import com.jjh.filemanager.bean.EncryptedItem;
 import com.jjh.filemanager.bean.FileBean;
 import com.jjh.filemanager.bean.FileType;
 import com.jjh.filemanager.bean.TitlePath;
 import com.jjh.filemanager.fragment.classifyFileFragment;
+
+import org.litepal.crud.DataSupport;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -46,7 +49,6 @@ public class ClassifyFileActivity extends AppCompatActivity {
     private RelativeLayout bodyLayout;
     private LinearLayout activityClassify_bottom;
     private List<FileBean> beanList = new ArrayList<>();
-    private List<FileBean> privateList = new ArrayList<>();
     private LinearLayout empty_rel ;
     private int Type;
     private ProgressBar progressBar;
@@ -104,28 +106,68 @@ public class ClassifyFileActivity extends AppCompatActivity {
                 if ( viewHolder instanceof FileHolder){
                     FileBean file = beanList.get(position);
                     FileType fileType = file.getFileType() ;
-                    try {
-                        if ( fileType == FileType.apk ){
-                            //安装app
-                            FileUtil.openAppIntent( ClassifyFileActivity.this , new File( file.getPath() ) );
-                        }else if ( fileType == FileType.image ){
-                            FileUtil.openImageIntent( ClassifyFileActivity.this , new File( file.getPath() ));
-                        }else if ( fileType == FileType.txt ){
-                            FileUtil.openTextIntent( ClassifyFileActivity.this , new File( file.getPath() ) );
-                        }else if ( fileType == FileType.music ){
-                            FileUtil.openMusicIntent( ClassifyFileActivity.this ,  new File( file.getPath() ) );
-                        }else if ( fileType == FileType.video ){
-                            FileUtil.openVideoIntent( ClassifyFileActivity.this ,  new File( file.getPath() ) );
-                        }else if ( fileType == FileType.pdf ){
-                            FileUtil.openPDFIntent( ClassifyFileActivity.this ,  new File( file.getPath() ) );
-                        }else if ( fileType == FileType.doc ){
-                            FileUtil.openDocIntent( ClassifyFileActivity.this ,  new File( file.getPath() ) );
-                        }else {
-                            FileUtil.openApplicationIntent( ClassifyFileActivity.this , new File( file.getPath() ) );
+                    File f;
+                    if(Type == PRIVATE_FILE){
+//                        //如果是已经加密的文件
+//                        String oldPath = file.getPath();
+//                        String privatePath = file.getPrivatePath();
+//                        Boolean state = FileUtil.copyFile(privatePath, oldPath);
+//                        if(state){
+//                            f = new File(oldPath);
+//                            try {
+//                                if (fileType == FileType.apk) {
+//                                    //安装app
+//                                    FileUtil.openAppIntent(ClassifyFileActivity.this, f);
+//                                } else if (fileType == FileType.image) {
+//                                    FileUtil.openImageIntent(ClassifyFileActivity.this, f);
+//                                } else if (fileType == FileType.txt) {
+//                                    FileUtil.openTextIntent(ClassifyFileActivity.this, f);
+//                                } else if (fileType == FileType.music) {
+//                                    FileUtil.openMusicIntent(ClassifyFileActivity.this, f);
+//                                } else if (fileType == FileType.video) {
+//                                    FileUtil.openVideoIntent(ClassifyFileActivity.this, f);
+//                                } else if (fileType == FileType.pdf) {
+//                                    FileUtil.openPDFIntent(ClassifyFileActivity.this, f);
+//                                } else if (fileType == FileType.doc) {
+//                                    FileUtil.openDocIntent(ClassifyFileActivity.this, f);
+//                                } else {
+//                                    FileUtil.openApplicationIntent(ClassifyFileActivity.this, f);
+//                                }
+//
+//                            } catch (Exception e) {
+//                                Log.e(TAG, "呀！打开出现问题了" + e.getMessage());
+//                                e.printStackTrace();
+//                            }
+//                            f.delete();
+//                            //因为文件信息是数据库读取的，实际删除文件后还需要去更新数据库
+//                            FileUtil.updateExternalDB(oldPath, ClassifyFileActivity.this);
+//                        }
+                    }else {
+                        //正常文件
+                        try {
+                            f = new File(file.getPath());
+                            if (fileType == FileType.apk) {
+                                //安装app
+                                FileUtil.openAppIntent(ClassifyFileActivity.this, f);
+                            } else if (fileType == FileType.image) {
+                                FileUtil.openImageIntent(ClassifyFileActivity.this, f);
+                            } else if (fileType == FileType.txt) {
+                                FileUtil.openTextIntent(ClassifyFileActivity.this, f);
+                            } else if (fileType == FileType.music) {
+                                FileUtil.openMusicIntent(ClassifyFileActivity.this, f);
+                            } else if (fileType == FileType.video) {
+                                FileUtil.openVideoIntent(ClassifyFileActivity.this, f);
+                            } else if (fileType == FileType.pdf) {
+                                FileUtil.openPDFIntent(ClassifyFileActivity.this, f);
+                            } else if (fileType == FileType.doc) {
+                                FileUtil.openDocIntent(ClassifyFileActivity.this, f);
+                            } else {
+                                FileUtil.openApplicationIntent(ClassifyFileActivity.this, f);
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "呀！打开出现问题了" + e.getMessage());
+                            e.printStackTrace();
                         }
-                    }catch (Exception e){
-                        Log.e(TAG, "呀！打开出现问题了" + e.getMessage());
-                        e.printStackTrace();
                     }
                 }
             }
@@ -188,7 +230,7 @@ public class ClassifyFileActivity extends AppCompatActivity {
                 break;
             case PRIVATE_FILE:
                 title.setText("私人目录");
-                beanList = new ArrayList<FileBean>(privateList);
+                beanList = getPrivateFiles();
                 break;
             default:
 
@@ -210,59 +252,6 @@ public class ClassifyFileActivity extends AppCompatActivity {
 
     }
 
-    //删除文件方法
-    private boolean deleteFile(FileBean fileBean){
-        try {
-            String path = fileBean.getPath();
-            new File(path).delete();//因为文件信息是数据库读取的，实际删除文件后还需要去更新数据库
-            FileUtil.updateExternalDB(fileBean.getPath(), ClassifyFileActivity.this);
-            return true;
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    //解密方法
-    private boolean decipheringFile(FileBean fileBean){
-        try {
-            String privateName = fileBean.getPrivateName();
-            String path = fileBean.getPath();
-            String privatePath = fileBean.getPrivatePath();
-            new File(privatePath).renameTo(new File(path));
-            //因为文件信息是数据库读取的，实际删除文件后还需要去更新数据库
-            FileUtil.updateExternalDB(fileBean.getPrivatePath(), ClassifyFileActivity.this);
-            FileUtil.updateExternalDB(fileBean.getPath(), ClassifyFileActivity.this);
-            beanList.remove(fileBean);
-            privateList.remove(fileBean);
-            return true;
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    //加密方法
-    private boolean encryptionFile(FileBean fileBean){
-        try {
-            String privateName = FileUtil.getFileMD5(new File(fileBean.getPath()));
-            String path = fileBean.getPath();
-            String privatePath = path.substring(0,path.lastIndexOf(File.separator)+1) + "." +  privateName;
-            new File(path).renameTo(new File(privatePath));
-            beanList.remove(fileBean);
-            fileBean.setPrivateName(privateName);
-            fileBean.setPrivatePath(privatePath);
-            privateList.add(fileBean);
-            //因为文件信息是数据库读取的，实际删除文件后还需要去更新数据库
-            FileUtil.updateExternalDB(fileBean.getPath(), ClassifyFileActivity.this);
-            FileUtil.updateExternalDB(fileBean.getPrivatePath(), ClassifyFileActivity.this);
-            return true;
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
@@ -270,6 +259,9 @@ public class ClassifyFileActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.context_menu, menu);
         if(Type == PRIVATE_FILE) {
             menu.findItem(R.id.menu_deciphering).setVisible(true);
+            menu.findItem(R.id.menu_encryption).setVisible(false);
+            menu.findItem(R.id.menu_share).setVisible(false);
+
         }
     }
 
@@ -334,11 +326,19 @@ public class ClassifyFileActivity extends AppCompatActivity {
          */
         final AlertDialog.Builder normalDialog =
                 new AlertDialog.Builder(ClassifyFileActivity.this);
-        normalDialog.setMessage(
-                "文件名称：" + longClickFileBean.getName() + "\n" +
-                "文件大小：" + FileUtil.sizeToChange(longClickFileBean.getSize()) + "\n" +
-                "修改时间：" + longClickFileBean.getDate() + "\n" +
-                "文件位置：\n" + longClickFileBean.getPath());
+        if(Type == PRIVATE_FILE){
+            normalDialog.setMessage(
+                    "文件名称：" + longClickFileBean.getName() + "\n" +
+                    "文件大小：" + FileUtil.sizeToChange(longClickFileBean.getSize()) + "\n" +
+                    "修改时间：" + longClickFileBean.getDate() + "\n" +
+                    "文件加密前路径：\n" + longClickFileBean.getPath());
+        }else {
+            normalDialog.setMessage(
+                    "文件名称：" + longClickFileBean.getName() + "\n" +
+                    "文件大小：" + FileUtil.sizeToChange(longClickFileBean.getSize()) + "\n" +
+                    "修改时间：" + longClickFileBean.getDate() + "\n" +
+                    "文件路径：\n" + longClickFileBean.getPath());
+        }
         normalDialog.setPositiveButton("确定",
                 new DialogInterface.OnClickListener() {
                     @Override
@@ -348,7 +348,114 @@ public class ClassifyFileActivity extends AppCompatActivity {
                 });
         // 显示
         normalDialog.show();
+
     }
+
+    //从数据库取出加密列表
+    private List<FileBean> getPrivateFiles(){
+        List<FileBean> list = new ArrayList<>();
+        List<EncryptedItem> encryptedItems = DataSupport.findAll(EncryptedItem.class);
+        Log.e(TAG, "getPrivateFiles: " + encryptedItems.size() );
+        String oldName;
+        String privateName;
+        String oldPath;
+        String privatePath;
+        for(EncryptedItem encryptedItem: encryptedItems){
+            oldName = encryptedItem.getOldName();
+            privateName = encryptedItem.getPrivateName();
+            oldPath = encryptedItem.getOldPath();
+            privatePath = encryptedItem.getPrivatePath();
+//            Log.e(TAG, "getPrivateFiles: " + oldName );
+//            Log.e(TAG, "getPrivateFiles: " + privateName );
+//            Log.e(TAG, "getPrivateFiles: " + oldPath );
+//            Log.e(TAG, "getPrivateFiles: " + privatePath);
+            File file = new File(privatePath);
+            if (!file.exists()) {
+                //如果加密后的文件不存在，则删除数据库存放的相应记录
+                DataSupport.deleteAll(EncryptedItem.class, "oldPath = ? and privatePath = ?"
+                        , oldPath, privatePath);
+                continue;
+            }
+            FileBean fileBean = new FileBean();
+            fileBean.setName(oldName);
+            fileBean.setPath(oldPath);
+            fileBean.setPrivateName(privateName);
+            fileBean.setPrivatePath(privatePath);
+            fileBean.setFileType( FileUtil.getFileNameType( oldName ));
+            fileBean.setSize( file.length() );
+            fileBean.setDate(FileUtil.getFileLastModifiedTime(file));
+            list.add(fileBean);
+        }
+
+        return list;
+    }
+
+    //删除文件方法
+    private boolean deleteFile(FileBean fileBean){
+        try {
+            String path = fileBean.getPath();
+            new File(path).delete();//因为文件信息是数据库读取的，实际删除文件后还需要去更新数据库
+            FileUtil.updateExternalDB(fileBean.getPath(), ClassifyFileActivity.this);
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    //解密方法
+    private boolean decipheringFile(FileBean fileBean){
+        boolean decipheringState;
+        try {
+            String oldPath = fileBean.getPath();
+            String privatePath =fileBean.getPrivatePath();
+            new File(privatePath).renameTo(new File(oldPath));
+            beanList.remove(fileBean);
+            //对应删除数据库存放的记录
+            DataSupport.deleteAll(EncryptedItem.class, "oldPath = ? and privatePath = ?"
+                    , oldPath, privatePath);
+            //因为文件信息是external.db数据库读取的，实际更改文件后还需要去更新数据库
+            FileUtil.updateExternalDB(oldPath, ClassifyFileActivity.this);
+            FileUtil.updateExternalDB(privatePath, ClassifyFileActivity.this);
+            decipheringState = true;
+        }catch (Exception e){
+            e.printStackTrace();
+            decipheringState = false;
+        }
+        return decipheringState;
+    }
+
+    //加密方法
+    private boolean encryptionFile(FileBean fileBean){
+        boolean encryptionState;
+        try {
+            String oldName = fileBean.getName();
+            String privateName = "." + FileUtil.getFileNameMD5(oldName);
+            String oldPath = fileBean.getPath();
+            String privatePath = oldPath.substring(0,oldPath.lastIndexOf(File.separator)+1) + privateName;
+            //将加密信息放进sqlite数据库
+            EncryptedItem encryptedItem = new EncryptedItem();
+            encryptedItem.setOldName(oldName);
+            encryptedItem.setPrivateName(privateName);
+            encryptedItem.setOldPath(oldPath);
+            encryptedItem.setPrivatePath(privatePath);
+            encryptionState = encryptedItem.save();
+            if(encryptionState){
+                new File(oldPath).renameTo(new File(privatePath));
+                beanList.remove(fileBean);
+//                Log.e(TAG, "getPrivateFiles: 存入数据库成功啦！" + oldName);
+                //因为文件信息是external.db数据库读取的，实际删除文件后还需要去更新数据库
+                FileUtil.updateExternalDB(oldPath, ClassifyFileActivity.this);
+                FileUtil.updateExternalDB(privatePath, ClassifyFileActivity.this);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            encryptionState = false;
+        }
+        return encryptionState;
+    }
+
+
 
     private void showSearchDialog() {
     /*@setView 装入一个EditView

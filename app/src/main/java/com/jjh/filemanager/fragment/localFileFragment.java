@@ -12,7 +12,10 @@ import android.widget.TextView;
 
 import com.jjh.filemanager.FileUtil;
 import com.jjh.filemanager.R;
+import com.jjh.filemanager.bean.EncryptedItem;
 import com.jjh.filemanager.fragment.adapter.FragAdapter;
+
+import org.litepal.crud.DataSupport;
 
 /**
  *
@@ -36,6 +39,7 @@ public class localFileFragment extends Fragment {
         private RelativeLayout externalStorage;
         private TextView insideFileSize;
         private TextView externalFileSize;
+        private TextView privateFileSize;
         private String insideInfo;
         private String externalInfo;
         String rootPath;
@@ -68,7 +72,7 @@ public class localFileFragment extends Fragment {
             externalStorage = (RelativeLayout)getActivity().findViewById(R.id.external_storage);
             insideFileSize   = (TextView)getActivity().findViewById(R.id.insideFileSize);
             externalFileSize = (TextView)getActivity().findViewById(R.id.externalFileSize);
-
+            privateFileSize = (TextView)getActivity().findViewById(R.id.privateFileSize);
 //            if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 //                //检测手机自带的外部存储是否装载
 //                externalStorage.setVisibility(View.VISIBLE);
@@ -84,6 +88,8 @@ public class localFileFragment extends Fragment {
             }
             insideFileSize.setText(insideInfo);
             externalFileSize.setText(externalInfo);
+            //显示已加密文件个数
+            privateFileSize.setText(DataSupport.findAll(EncryptedItem.class).size() + "项");
         }
     }
 
