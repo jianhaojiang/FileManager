@@ -2,18 +2,15 @@ package com.jjh.filemanager.fragment;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.jjh.filemanager.FileUtil;
+import com.jjh.filemanager.Util.FileUtil;
 import com.jjh.filemanager.R;
-import com.jjh.filemanager.fragment.adapter.FragAdapter;
 
 /**
  * Created by jjh on 2018/1/23.

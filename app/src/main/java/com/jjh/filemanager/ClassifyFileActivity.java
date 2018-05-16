@@ -22,18 +22,20 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jjh.filemanager.Util.FileUtil;
 import com.jjh.filemanager.adapter.FileAdapter;
 import com.jjh.filemanager.adapter.FileHolder;
 import com.jjh.filemanager.adapter.base.RecyclerViewAdapter;
 import com.jjh.filemanager.bean.EncryptedItem;
 import com.jjh.filemanager.bean.FileBean;
 import com.jjh.filemanager.bean.FileType;
-import com.jjh.filemanager.bean.TitlePath;
-import com.jjh.filemanager.fragment.classifyFileFragment;
 
 import org.litepal.crud.DataSupport;
 
 import java.io.File;
+import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -394,19 +396,6 @@ public class ClassifyFileActivity extends AppCompatActivity {
         return list;
     }
 
-    //删除文件方法
-    private boolean deleteFile(FileBean fileBean){
-        try {
-            String path = fileBean.getPath();
-            new File(path).delete();//因为文件信息是数据库读取的，实际删除文件后还需要去更新数据库
-            FileUtil.updateExternalDB(fileBean.getPath(), ClassifyFileActivity.this);
-            return true;
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     //解密方法
     private boolean decipheringFile(FileBean fileBean){
         boolean decipheringState;
@@ -414,6 +403,7 @@ public class ClassifyFileActivity extends AppCompatActivity {
             String oldPath = fileBean.getPath();
             String privatePath =fileBean.getPrivatePath();
             new File(privatePath).renameTo(new File(oldPath));
+            FileUtil.encrypt(oldPath);
             beanList.remove(fileBean);
             //对应删除数据库存放的记录
             DataSupport.deleteAll(EncryptedItem.class, "oldPath = ? and privatePath = ?"
@@ -445,6 +435,7 @@ public class ClassifyFileActivity extends AppCompatActivity {
             encryptedItem.setPrivatePath(privatePath);
             encryptionState = encryptedItem.save();
             if(encryptionState){
+                FileUtil.encrypt(oldPath);
                 new File(oldPath).renameTo(new File(privatePath));
                 beanList.remove(fileBean);
 //                Log.e(TAG, "getPrivateFiles: 存入数据库成功啦！" + oldName);
@@ -458,8 +449,6 @@ public class ClassifyFileActivity extends AppCompatActivity {
         }
         return encryptionState;
     }
-
-
 
     private void showSearchDialog() {
     /*@setView 装入一个EditView

@@ -10,10 +10,9 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.jjh.filemanager.FileUtil;
+import com.jjh.filemanager.Util.FileUtil;
 import com.jjh.filemanager.R;
 import com.jjh.filemanager.bean.EncryptedItem;
-import com.jjh.filemanager.fragment.adapter.FragAdapter;
 
 import org.litepal.crud.DataSupport;
 

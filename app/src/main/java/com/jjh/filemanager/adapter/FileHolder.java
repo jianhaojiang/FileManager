@@ -1,13 +1,10 @@
 package com.jjh.filemanager.adapter;
-import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.jjh.filemanager.FileUtil;
+import com.jjh.filemanager.Util.FileUtil;
 import com.jjh.filemanager.R;
 import com.jjh.filemanager.adapter.base.RecyclerViewAdapter;
 import com.jjh.filemanager.adapter.base.RecyclerViewHolder;

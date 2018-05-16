@@ -1,14 +1,15 @@
-package com.jjh.filemanager;
+package com.jjh.filemanager.Util;
 
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.os.StatFs;
 import android.os.storage.StorageManager;
 
+import com.jjh.filemanager.ClassifyFileActivity;
+import com.jjh.filemanager.bean.EncryptedItem;
 import com.jjh.filemanager.bean.FileBean;
 import com.jjh.filemanager.bean.FileType;
 
@@ -16,17 +17,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Formatter;
-import java.util.Formatter.*;
 import java.util.List;
 
 import android.content.ContentResolver;
@@ -35,7 +37,8 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.Files;
 import android.provider.MediaStore.Files.FileColumns;
 import android.support.v4.content.FileProvider;
-import android.util.Log;
+
+import org.litepal.crud.DataSupport;
 
 /**
  * Created by jjh on 2017.
@@ -60,6 +63,62 @@ public class FileUtil {
                     }
                 });
     }
+
+
+
+    //删除文件方法
+    public static boolean deleteFile(FileBean fileBean, Context context){
+        try {
+            String path = fileBean.getPath();
+            new File(path).delete();//因为文件信息是数据库读取的，实际删除文件后还需要去更新数据库
+            FileUtil.updateExternalDB(fileBean.getPath(), context);
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * RandomAccessFile ：https://www.cnblogs.com/qjlbky/p/5925464.html
+     * 加解密 将文件开头读取的REVERSE_LENGTH位进行异或，异或两次即解密。
+     * 随机读写并不是说把数据写入任意一个随机的文件中，而是在指定的文件中通过文件指针实现在该文件指定位置的读取和写入。
+     * RandomAccessFile使用随机访问（即可以定位读取）的方式，而FileInputStream及FileOutputStream使用的是流式访问的方式。
+     * @param strFile
+     *            源文件绝对路径
+     * @return
+     */
+    public static boolean encrypt(String strFile) {
+        final int REVERSE_LENGTH = 32 * 1024;
+        int len = REVERSE_LENGTH;
+        try {
+            File f = new File(strFile);
+            RandomAccessFile raf = new RandomAccessFile(f, "rw");
+            long totalLen = raf.length();
+            if (totalLen < REVERSE_LENGTH)
+                len = (int) totalLen;
+//            Log.e(TAG, "encrypt: 1122233|" + raf.getFilePointer() + "|");
+            FileChannel channel = raf.getChannel();
+            MappedByteBuffer buffer = channel.map(
+                    FileChannel.MapMode.READ_WRITE, 0, len);
+            byte tmp;
+            for (int i = 0; i < len; i++) {
+                byte rawByte = buffer.get(i);
+                tmp = (byte) (rawByte ^ i);
+                buffer.put(i, tmp);
+            }
+//            Log.e(TAG, "encrypt: 1122233后|" + raf.getFilePointer() + "|");
+            buffer.force();
+            buffer.clear();
+            channel.close();
+            raf.close();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 
     private static List<FileBean> getAllPhoto(Context mContext) {
 

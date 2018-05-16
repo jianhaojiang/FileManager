@@ -2,11 +2,9 @@ package com.jjh.filemanager;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -16,21 +14,16 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.jjh.filemanager.bean.FileBean;
+import com.jjh.filemanager.Util.FileUtil;
 import com.jjh.filemanager.fragment.adapter.FragAdapter;
 import com.jjh.filemanager.fragment.classifyFileFragment;
 import com.jjh.filemanager.fragment.localFileFragment;
 
 import org.litepal.tablemanager.Connector;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Formatter;
 import java.util.List;
 
 import permissions.dispatcher.NeedsPermission;
